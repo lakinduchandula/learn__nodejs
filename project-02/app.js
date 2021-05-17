@@ -25,23 +25,29 @@ const server = http.createServer((req, res) => {
 
   if (url === "/message" && method === "POST") {
     const body = [];
-    // this method will keep listening for data, data is coming as chunks
+    // this method will keep listening for data event, data is coming as chunks
     req.on("data", chunk => {
       // this will push chunks to the array declare under const but it doesn't mean that we can't edit what in side it,
       // const mean that we can't declare agin
       body.push(chunk);
       console.log(chunk);
     });
-    // this method can listen to end of events
-    req.on("end", () => {
+    // this method can listen to end event
+    return req.on("end", () => {
       const parsedBody = Buffer.concat(body).toString();  // buffer can concat all chunks in to one string it will output through toString
       const submitData = parsedBody.split("=")[1];  // split by "=" then put into a array index of the value is [1]
       fs.writeFileSync("message.txt", submitData);  // write into the message.txt
       console.log(submitData);
+      res.statusCode = 302;
+      res.setHeader("Location", "/");
+      return res.end();
+     /********************************************************************
+      * In here this is a callback function, this function will not 
+      * execute immediately when "req.on("end", ..)" is registerd.
+      * beacuse of that we call this functions as asynchronous functions,
+      * after this compiler will execute from line 54
+      ********************************************************************/
     });
-    res.statusCode = 302;
-    res.setHeader("Location", "/");
-    return res.end();
   }
 
   // set up Header
