@@ -23,10 +23,24 @@ const server = http.createServer((req, res) => {
     return res.end();
   }
 
-  if (url === '/message' && method === 'POST'){
-    fs.writeFileSync('message.txt', 'DUMMY TEXT');
-    res.statusCode = 302 ;
-    res.setHeader('Location', '/');
+  if (url === "/message" && method === "POST") {
+    const body = [];
+    // this method will keep listening for data, data is coming as chunks
+    req.on("data", chunk => {
+      // this will push chunks to the array declare under const but it doesn't mean that we can't edit what in side it,
+      // const mean that we can't declare agin
+      body.push(chunk);
+      console.log(chunk);
+    });
+    // this method can listen to end of events
+    req.on("end", () => {
+      const parsedBody = Buffer.concat(body).toString();  // buffer can concat all chunks in to one string it will output through toString
+      const submitData = parsedBody.split("=")[1];  // split by "=" then put into a array index of the value is [1]
+      fs.writeFileSync("message.txt", submitData);  // write into the message.txt
+      console.log(submitData);
+    });
+    res.statusCode = 302;
+    res.setHeader("Location", "/");
     return res.end();
   }
 
