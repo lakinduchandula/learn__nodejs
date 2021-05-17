@@ -34,19 +34,27 @@ const server = http.createServer((req, res) => {
     });
     // this method can listen to end event
     return req.on("end", () => {
-      const parsedBody = Buffer.concat(body).toString();  // buffer can concat all chunks in to one string it will output through toString
-      const submitData = parsedBody.split("=")[1];  // split by "=" then put into a array index of the value is [1]
-      fs.writeFileSync("message.txt", submitData);  // write into the message.txt
-      console.log(submitData);
-      res.statusCode = 302;
-      res.setHeader("Location", "/");
-      return res.end();
-     /********************************************************************
-      * In here this is a callback function, this function will not 
-      * execute immediately when "req.on("end", ..)" is registerd.
-      * beacuse of that we call this functions as asynchronous functions,
-      * after this compiler will execute from line 54
-      ********************************************************************/
+      const parsedBody = Buffer.concat(body).toString(); // buffer can concat all chunks in to one string it will output through toString
+      const submitData = parsedBody.split("=")[1]; // split by "=" then put into a array index of the value is [1]
+
+      /*** when writig file there is two methods one is fs.writeFile and fs.writeFileSync ; 
+           Sync means that this method will block the code execution until the file does it work 
+      ***/
+      fs.writeFile("message.txt", submitData, err => {
+        // third one is a callback function when it's done get executes
+        // all code under this will execute when this method only done it's work and it's easy to err handling
+        console.log(submitData);
+        res.statusCode = 302;
+        res.setHeader("Location", "/");
+        return res.end();
+      }); // write into the message.txt
+
+      /********************************************************************
+       * In here this is a callback function, this function will not
+       * execute immediately when "req.on("end", ..)" is registerd.
+       * beacuse of that we call this functions as asynchronous functions,
+       * after this compiler will execute from line 54
+       ********************************************************************/
     });
   }
 
