@@ -1,0 +1,16 @@
+{
+  "name": "node__academind",
+  "version": "1.0.0",
+  "description": "Learning node js with Node Complete Guid",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "author": "Lakindu Chandula - lakindu.chandula@outlook.com",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
+ 
