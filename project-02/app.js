@@ -9,6 +9,13 @@ const shopRoutes = require("./routes/shop");
 
 const app = express(); // this express will handle almost very thing in behind the scenes
 
+app.set('view engine', 'ejs'); // this will setup ejs as the template engine
+
+// this will setup where temp file in, 
+//if temp file are is some where besides views folder second argument should replace by that folder name
+app.set('views', 'views');  
+
+
 app.use(express.urlencoded({ // this will help to catch the body in express package
   extended: true
 }));
@@ -20,7 +27,7 @@ app.use('/admin', adminData.routes); // handling all admin routes
 app.use(shopRoutes); // handling all shop routes
 
 app.use((req, res, next) => { // this will handle all the undefined routes
-  res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
+  res.status(404).render('404', { pageTitle: 'Page Not Found', path: req.path });
 })
 
 app.listen(3000); // this will do both creating server and listen on port 3000
