@@ -1,5 +1,3 @@
-const http = require("http");
-
 // 3rd party libraries
 const express = require("express");
 
@@ -18,8 +16,7 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
   console.log("This is another middleware");
+  res.send('<h1>Hello from express.js</h1>'); //  this send(); method can use to send a almost any response
 });
 
-const server = http.createServer(app); // app is valid request handler
-
-server.listen(3000); // this line will listen through port 3000 when it's done it will run line 3
+app.listen(3000); // this will do both creating server and listen on port 3000
