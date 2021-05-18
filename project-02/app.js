@@ -4,7 +4,7 @@ const path = require('path');
 const express = require("express");
 
 // custom (my own) libraries
-const adminData = require("./routes/admin");
+const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 
 const app = express(); // this express will handle almost very thing in behind the scenes
@@ -23,7 +23,7 @@ app.use(express.urlencoded({ // this will help to catch the body in express pack
 // this middleware function will give the access to the user to read our file system in public folder
 app.use(express.static(path.join(__dirname, 'public'))); 
 
-app.use('/admin', adminData.routes); // handling all admin routes
+app.use('/admin', adminRoutes); // handling all admin routes
 app.use(shopRoutes); // handling all shop routes
 
 app.use((req, res, next) => { // this will handle all the undefined routes
