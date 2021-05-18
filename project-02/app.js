@@ -1,8 +1,10 @@
 const http = require('http');
 
-// custom imports
-const routes = require('./routes')
+// 3rd party libraries
+const express = require('express');
 
-const server = http.createServer(routes);
+const app = express(); // this express will handle almost very thing in behind the scenes
+
+const server = http.createServer(app); // app is valid request handler
 
 server.listen(3000); // this line will listen through port 3000 when it's done it will run line 3
