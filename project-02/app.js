@@ -13,6 +13,9 @@ app.use(express.urlencoded({ // this will help to catch the body in express pack
   extended: true
 }));
 
+// this middleware function will give the access to the user to read our file system in public folder
+app.use(express.static(path.join(__dirname, 'public'))); 
+
 app.use('/admin', adminRoutes); // handling all admin routes
 app.use(shopRoutes); // handling all shop routes
 
