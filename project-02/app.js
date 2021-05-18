@@ -11,7 +11,7 @@ app.use(express.urlencoded({ // this will help to catch the body in express pack
   extended: true
 }));
 
-app.use(adminRoutes); // handling all admin routes
+app.use('/admin', adminRoutes); // handling all admin routes
 app.use(shopRoutes); // handling all shop routes
 
 app.use((req, res, next) => { // this will handle all the undefined routes
