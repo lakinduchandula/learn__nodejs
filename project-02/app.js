@@ -1,24 +1,21 @@
 // 3rd party libraries
 const express = require("express");
 
+// custom (my own) libraries
+const adminRoutes = require("./routes/admin");
+const shopRoutes = require("./routes/shop");
+
 const app = express(); // this express will handle almost very thing in behind the scenes
 
 app.use(express.urlencoded({ // this will help to catch the body in express package
   extended: true
 }));
 
-app.use('/add-product', (req, res, next) => {
-  res.send('<form action="/product" method="POST"><input type="text" name="title"><button type="submit">Add Product</button></form>');
-});
+app.use(adminRoutes); // handling all admin routes
+app.use(shopRoutes); // handling all shop routes
 
-// we can put get, post method insted of use after app. , app.post mean it will only run under post method
-app.post('/product', (req, res, next) => { 
-  console.log(req.body);
-  res.redirect('/');
-});
-
-app.use('/', (req, res, next) => {
-  res.send('<h1>Hello from express.js</h1>'); //  this send(); method can use to send a almost any response
-});
+app.use((req, res, next) => { // this will handle all the undefined routes
+  res.status(404).send('<h1>Page Not Found</h1>');
+})
 
 app.listen(3000); // this will do both creating server and listen on port 3000
