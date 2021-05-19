@@ -20,7 +20,8 @@ exports.postAddProduct = (req, res, next) => {
 
 // export this get methods shop product middleware func
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll(products => {
+  // directly call to static func through class name Product
+  Product.fetchAll(products => { 
     res.render("shop", {
       prods: products,
       pageTitle: "Shop",
