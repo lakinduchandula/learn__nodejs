@@ -28,6 +28,9 @@ module.exports = class Product {
   }
 
   save() {
+    // assing a unique ID to every saved product
+    this.id = Math.random().toString;
+    
     //  this method will save products
     getProductsFromFile(products => {
       products.push(this);
