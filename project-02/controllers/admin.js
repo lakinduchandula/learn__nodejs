@@ -18,17 +18,12 @@ exports.postAddProduct = (req, res, next) => {
   res.redirect("/");
 };
 
-// export this get methods shop product middleware func
 exports.getProducts = (req, res, next) => {
-  // directly call to static func through class name Product
-  Product.fetchAll(products => { 
-    res.render("shop/product-list", {
+  Product.fetchAll(products => {
+    res.render("admin/products", {
       prods: products,
-      pageTitle: "Shop",
-      path: "/",
-      hasProducts: products.length > 0,
-      activeShop: true,
-      productCSS: true,
+      pageTitle: "Admin Products",
+      path: "/admin/products",
     });
   });
 };
