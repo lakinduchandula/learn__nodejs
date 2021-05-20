@@ -26,6 +26,15 @@ exports.getIndex = (req, res, next) => {
   });
 };
 
+exports.getProduct = (req, res, next) => {
+  /********************************************** NOTE ***************************************************
+   * req.params can access the dynamic content after /products/:productId had,                           *
+   *  but in here very essential to same the name after : (productId) and the req.params (productId).    *
+   *******************************************************************************************************/
+  const prodId = req.params.productId; 
+  res.redirect('/');
+}
+
 // Cart Page Controller
 exports.getCart = (req, res, next) => {
   res.render("shop/cart", {
