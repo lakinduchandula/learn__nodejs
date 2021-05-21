@@ -2,12 +2,9 @@ const Product = require("../models/product");
 
 // export this get method add product middleware func
 exports.getAddProduct = (req, res, next) => {
-  res.render("admin/add-product", {
+  res.render("admin/edit-product", {
     pageTitle: "Add Product",
     path: "/admin/add-product",
-    formsCSS: true,
-    productCSS: true,
-    activeAddProduct: true,
   });
 };
 
@@ -22,6 +19,24 @@ exports.postAddProduct = (req, res, next) => {
   const product = new Product(title, imageUrl, description, price);
   product.save();
   res.redirect("/");
+};
+
+exports.getEditProduct = (req, res, next) => {
+  /************************************ QUERY PARAMETER *************************************
+   * express manage a method of request call query (req.query), using this we can access    *
+   * extra value by separated by & after address by ?                                       *
+   * /edit-product/12345?edit=true&title=new like this, key value pairs                     *
+   * we can access them using key and req.query.KEY  (type is string | true => "true")      *
+   ******************************************************************************************/
+  const editMode = req.query.edit;
+  if (!editMode) {
+    return res.redirect("/");
+  }
+  res.render("admin/edit-product", {
+    pageTitle: "Edit Product",
+    path: "/admin/edit-product",
+    editing: editMode,
+  });
 };
 
 exports.getProducts = (req, res, next) => {

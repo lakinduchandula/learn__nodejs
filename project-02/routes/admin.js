@@ -14,4 +14,6 @@ routes.get("/products", adminController.getProducts);
 // reach under /admin/add-product => POST
 routes.post("/add-product", adminController.postAddProduct);
 
+routes.get("/edit-product/:productId", adminController.getEditProduct);
+
 module.exports = routes;

@@ -1,4 +1,5 @@
 const Product = require("../models/product");
+const Cart = require("../models/cart");
 
 // export this get methods shop product middleware func
 exports.getProducts = (req, res, next) => {
@@ -34,7 +35,7 @@ exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
   Product.findById(prodId, product => {
     res.render("shop/product-detail", {
-      path: "/products",  // which navigation should highlight
+      path: "/products", // which navigation should highlight
       pageTitle: product.title, // which page title should display
       product: product, // passing product arry to the shop/product-detail.ejs file
     });
@@ -51,9 +52,11 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
-  console.log(prodId);
-  res.redirect('/cart');
-}
+  Product.findById(prodId, product => {
+    Cart.addProduct(prodId, product.price);
+  });
+  res.redirect("/cart");
+};
 
 // Order Page Controller
 exports.getOrders = (req, res, next) => {
