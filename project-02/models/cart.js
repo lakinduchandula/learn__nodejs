@@ -31,10 +31,8 @@ module.exports = class Cart {
       // check whether specified product is already exists or not
       if (existingProduct) {
         // already exists
-        console.log("line 34 - existingProduct ", existingProduct);
         //updatedProduct = { ...existingProduct }; <- CANT UNDERSTAND WHY THIS LINE; NO USEFUL TO ME
         updatedProduct = existingProduct;
-        console.log("line 36 - updatedProduct ", updatedProduct);
         updatedProduct.qty += 1; // increment the quantity by 1
 
         //update the cart by making changes
@@ -50,7 +48,7 @@ module.exports = class Cart {
       // update the total price
       // update the total price "+" will typecasting text to number
       cart.totalPrice += +productPrice;
-      
+
       fs.writeFile(location, JSON.stringify(cart), err => {
         if (err) console.log(err);
       });
@@ -59,20 +57,40 @@ module.exports = class Cart {
 
   static deleteProduct(id, productPrice) {
     fs.readFile(location, (err, fileContent) => {
-      if(err) {
+      if (err) {
         return;
       }
       const updatedCart = { ...JSON.parse(fileContent) };
       const product = updatedCart.products.find(prod => prod.id === id);
-      updatedCart.products = updatedCart.products.filter(product => product.id !== id);
+
+      // we have to check whether product is exsist or not
+      if (!product) {
+        // because somewhere down in the code we need to get the qty of that product,
+        // without exsisting a product we cant get the qty, so the system genarate error
+        return;
+      }
+      updatedCart.products = updatedCart.products.filter(
+        product => product.id !== id
+      );
 
       const updatedQty = product.qty;
-      updatedCart.totalPrice -= productPrice * updatedQty;
+      updatedCart.totalPrice =
+        updatedCart.totalPrice - productPrice * updatedQty;
 
       fs.writeFile(location, JSON.stringify(updatedCart), err => {
-        if(err) return console.error(err);
+        if (err) return console.error(err);
       });
-    
+    });
+  }
+
+  static getCart(cb) {
+    fs.readFile(location, (err, fileContent) => {
+      if (err) {
+        cb(null);
+      } else {
+        const cart = JSON.parse(fileContent);
+        cb(cart);
+      }
     });
   }
 };
