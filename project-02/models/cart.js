@@ -50,9 +50,29 @@ module.exports = class Cart {
       // update the total price
       // update the total price "+" will typecasting text to number
       cart.totalPrice += +productPrice;
+      
       fs.writeFile(location, JSON.stringify(cart), err => {
         if (err) console.log(err);
       });
+    });
+  }
+
+  static deleteProduct(id, productPrice) {
+    fs.readFile(location, (err, fileContent) => {
+      if(err) {
+        return;
+      }
+      const updatedCart = { ...JSON.parse(fileContent) };
+      const product = updatedCart.products.find(prod => prod.id === id);
+      updatedCart.products = updatedCart.products.filter(product => product.id !== id);
+
+      const updatedQty = product.qty;
+      updatedCart.totalPrice -= productPrice * updatedQty;
+
+      fs.writeFile(location, JSON.stringify(updatedCart), err => {
+        if(err) return console.error(err);
+      });
+    
     });
   }
 };

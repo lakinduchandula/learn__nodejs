@@ -1,6 +1,9 @@
 const fs = require("fs");
 const path = require("path");
 
+// 3rd party libraries (custom lib)
+const Cart = require('./cart');
+
 // this will give the location globally
 const location = path.join(
   path.dirname(require.main.filename),
@@ -20,7 +23,8 @@ const getProductsFromFile = cb => {
 
 module.exports = class Product {
   // constructor in the class
-  constructor(title, imageUrl, description, price) {
+  constructor(id, title, imageUrl, description, price) {
+    this.id = id;
     this.title = title;
     this.imageUrl = imageUrl;
     this.price = price;
@@ -28,14 +32,39 @@ module.exports = class Product {
   }
 
   save() {
-    // assing a unique ID to every saved product
-    this.id = Math.random().toString();
-    console.log(this);
     //  this method will save products
     getProductsFromFile(products => {
-      products.push(this);
-      fs.writeFile(location, JSON.stringify(products), err => {
-        if (err) console.log(err); // this will run if it is only err
+      if (this.id) {
+        const existingProductIndex = products.findIndex(
+          prod => prod.id === this.id
+        );
+        const updatedProducts = [...products];
+        updatedProducts[existingProductIndex] = this;
+        fs.writeFile(location, JSON.stringify(updatedProducts), err => {
+          if (err) console.log(err); // this will run if it is only err
+        });
+      } else {
+        // assing a unique ID to every saved product
+        this.id = Math.random().toString();
+        products.push(this);
+        fs.writeFile(location, JSON.stringify(products), err => {
+          if (err) console.log(err); // this will run if it is only err
+        });
+      }
+    });
+  }
+
+  static deleteById(id) {
+    getProductsFromFile(products => {
+      // searching the product before deleted
+      const product = products.find(prod => prod.id === id);
+
+      /**** products.filter will throw all the match item according to the logic
+       (prod.id !== id) and put into a new array ****/
+      const updatedProducts = products.filter(prod => prod.id !== id);
+
+      fs.writeFile(location, JSON.stringify(updatedProducts), err => {
+        if (!err) Cart.deleteProduct(id, product.price); // this will run if no err
       });
     });
   }
