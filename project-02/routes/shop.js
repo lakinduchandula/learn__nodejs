@@ -12,6 +12,8 @@ router.get("/products", shopController.getProducts);
 
 router.get("/cart", shopController.getCart);
 
+router.post("/cart", shopController.postCart);
+
 /******************************** THEORY ********************************************* 
  * ":" indicates a variable(dynamic) path like when we type product/:productId,      *
  *  it means any thing after product/1234                                            *

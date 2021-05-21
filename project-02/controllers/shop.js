@@ -34,9 +34,9 @@ exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
   Product.findById(prodId, product => {
     res.render("shop/product-detail", {
-      path: "/products",
-      pageTitle: product.title,
-      product: product,
+      path: "/products",  // which navigation should highlight
+      pageTitle: product.title, // which page title should display
+      product: product, // passing product arry to the shop/product-detail.ejs file
     });
   });
 };
@@ -48,6 +48,12 @@ exports.getCart = (req, res, next) => {
     pageTitle: "Your Cart",
   });
 };
+
+exports.postCart = (req, res, next) => {
+  const prodId = req.body.productId;
+  console.log(prodId);
+  res.redirect('/cart');
+}
 
 // Order Page Controller
 exports.getOrders = (req, res, next) => {
