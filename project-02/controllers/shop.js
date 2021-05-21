@@ -31,9 +31,15 @@ exports.getProduct = (req, res, next) => {
    * req.params can access the dynamic content after /products/:productId had,                           *
    *  but in here very essential to same the name after : (productId) and the req.params (productId).    *
    *******************************************************************************************************/
-  const prodId = req.params.productId; 
-  res.redirect('/');
-}
+  const prodId = req.params.productId;
+  Product.findById(prodId, product => {
+    res.render("shop/product-detail", {
+      path: "/products",
+      pageTitle: product.title,
+      product: product,
+    });
+  });
+};
 
 // Cart Page Controller
 exports.getCart = (req, res, next) => {

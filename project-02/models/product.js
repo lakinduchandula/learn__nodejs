@@ -29,8 +29,8 @@ module.exports = class Product {
 
   save() {
     // assing a unique ID to every saved product
-    this.id = Math.random().toString;
-    
+    this.id = Math.random().toString();
+    console.log(this);
     //  this method will save products
     getProductsFromFile(products => {
       products.push(this);
@@ -45,5 +45,12 @@ module.exports = class Product {
   static fetchAll(cb) {
     // we are using callback because of evet driven architecture
     getProductsFromFile(cb);
+  }
+
+  static findById(id, cb) {
+    getProductsFromFile(products => {
+      const product = products.find(p => p.id == id);
+      cb(product);
+    });
   }
 };
