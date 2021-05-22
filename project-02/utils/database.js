@@ -5,11 +5,12 @@ let _db; // "_" means that this variable is only use in this file
 
 const mongoConnect = callback => {
   MongoClient.connect(
-    "mongodb+srv://lakinduchandula:befUUaXreUAbXmSb@cluster0.fjhfb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+    "mongodb+srv://lakinduchandula:befUUaXreUAbXmSb@cluster0.fjhfb.mongodb.net/shop?retryWrites=true&w=majority",
+    { useNewUrlParser: true, useUnifiedTopology: true }
   )
     .then(client => {
       console.log("Connected!");
-      _db = client.db;
+      _db = client.db();
       callback();
     })
     .catch(err => {
@@ -17,7 +18,7 @@ const mongoConnect = callback => {
     });
 };
 
-const getDb = _db => {
+const getDb = () => {
   if (_db) {
     return _db;
   }

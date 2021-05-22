@@ -6,7 +6,7 @@ const express = require("express");
 // custom (my own) libraries
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
-const mongoConnect = require('./utils/database');
+const mongoConnect = require('./utils/database').mongoConnect;
 
 // import controllers
 const pageNotFoundController = require('./controllers/404');
