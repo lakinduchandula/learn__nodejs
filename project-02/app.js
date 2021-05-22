@@ -6,6 +6,7 @@ const express = require("express");
 // custom (my own) libraries
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
+const mongoConnect = require('./utils/database');
 
 // import controllers
 const pageNotFoundController = require('./controllers/404');
@@ -31,4 +32,8 @@ app.use(shopRoutes); // handling all shop routes
 
 app.use(pageNotFoundController.NotFoundPage);
 
-app.listen(3000); // this will do both creating server and listen on port 3000
+mongoConnect(() => { // call the database fuction in util/database.js have
+  app.listen(3000); // this will do both creating server and listen on port 3000
+})
+
+
