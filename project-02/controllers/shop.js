@@ -4,13 +4,17 @@ const Cart = require("../models/cart");
 // export this get methods shop product middleware func
 exports.getProducts = (req, res, next) => {
   // directly call to static func through class name Product
-  Product.fetchAll(products => {
-    res.render("shop/product-list", {
-      prods: products,
-      pageTitle: "All Products",
-      path: "/products",
+  Product.fetchAll()
+    .then(products => {
+      res.render("shop/product-list", {
+        prods: products,
+        pageTitle: "All Products",
+        path: "/products",
+      });
+    })
+    .catch(err => {
+      console.log(err);
     });
-  });
 };
 
 // Index Page Controller
@@ -34,13 +38,18 @@ exports.getProduct = (req, res, next) => {
    *  but in here very essential to same the name after : (productId) and the req.params (productId).    *
    *******************************************************************************************************/
   const prodId = req.params.productId;
-  Product.findById(prodId, product => {
-    res.render("shop/product-detail", {
-      path: "/products", // which navigation should highlight
-      pageTitle: product.title, // which page title should display
-      product: product, // passing product arry to the shop/product-detail.ejs file
+  Product.findById(prodId)
+    .then(product => {
+      console.log(product);
+      res.render("shop/product-detail", {
+        path: "/products", // which navigation should highlight
+        pageTitle: product.title, // which page title should display
+        product: product, // passing product arry to the shop/product-detail.ejs file
+      });
+    })
+    .catch(err => {
+      console.log(err);
     });
-  });
 };
 
 // Cart Page Controller

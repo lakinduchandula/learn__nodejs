@@ -1,3 +1,6 @@
+const mongodb = require('mongodb');
+
+// 3rd party custom libraries
 const getDb = require("../utils/database").getDb;
 
 class Product {
@@ -29,11 +32,26 @@ class Product {
      *****************************************************************************/
     console.log("At Product model");
     const db = getDb(); // get database attached to node appication
-    return db.collection("products")
+    return db
+      .collection("products")
       .find()
       .toArray()
       .then(products => {
         return products;
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+
+  static findById(id) {
+    const db = getDb(); // get database attached to node appication
+    return db
+      .collection("products")
+      .find({ _id: mongodb.ObjectID(id) })
+      .next()
+      .then(product => {
+        return product;
       })
       .catch(err => {
         console.log(err);
