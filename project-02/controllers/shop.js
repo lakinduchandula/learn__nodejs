@@ -15,16 +15,17 @@ exports.getProducts = (req, res, next) => {
 
 // Index Page Controller
 exports.getIndex = (req, res, next) => {
-  /** FOR NOW PRODUCT LIST = INDEX PAGES **/
-
-  // directly call to static func through class name Product
-  Product.fetchAll(products => {
-    res.render("shop/index", {
-      prods: products,
-      pageTitle: "Shop",
-      path: "/",
+  Product.fetchAll()
+    .then(products => {
+      res.render("shop/index", {
+        prods: products,
+        pageTitle: "Shop",
+        path: "/",
+      });
+    })
+    .catch(err => {
+      console.log(err);
     });
-  });
 };
 
 exports.getProduct = (req, res, next) => {
@@ -72,7 +73,7 @@ exports.postCartDelete = (req, res, next) => {
   const prodId = req.body.productId;
   Product.findById(prodId, product => {
     Cart.deleteProduct(prodId, product.price);
-    res.redirect('/cart');
+    res.redirect("/cart");
   });
 };
 
