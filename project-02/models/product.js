@@ -9,18 +9,18 @@ class Product {
     this.imageUrl = imageUrl;
     this.price = price;
     this.description = description;
-    this._id = _id;
+    this._id = _id ? _id : null;
   }
 
   save() {
     const db = getDb(); // get database attached to node appication
-    let dpOp; // set the database operation
+    let dbOp ; // set the database operation
 
     // check whether this._id is exist or not and make the decision update or
     // insert new product to the database
     if (this._id) {
       /** this line we can mention all the attributes insted of "this" **/
-      dpOp = db
+      dbOp = db
         .collection("products")
         .updateOne({ _id: new mongodb.ObjectId(this._id) }, { $set: this });
     } else {
@@ -28,7 +28,7 @@ class Product {
         .collection("products") //  make collection to save data
         .insertOne(this); // inserting the object
     }
-    return dpOp
+    return dbOp
       .then(result => {
         console.log(result); // run if process succeeded
       })
@@ -65,6 +65,17 @@ class Product {
       .then(product => {
         return product;
       })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+
+  static deleteById(id) {
+    const db = getDb(); // get database attached to node appication
+    return db
+      .collection("products")
+      .deleteOne({ _id: mongodb.ObjectID(id) })
+      .then()
       .catch(err => {
         console.log(err);
       });
