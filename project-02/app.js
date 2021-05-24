@@ -30,13 +30,12 @@ app.use(
 app.use((req, res, next) => {
   User.findById("60ab59a2b3ccbe279141f972")
     .then(user => {
-      req.user = user;
+      req.user = user; // add the user to request so we can access it any where
       next();
     })
     .catch(err => {
       console.log(err);
     });
-  next();
 });
 
 // this middleware function will give the access to the user to read our file system in public folder
