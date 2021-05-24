@@ -14,7 +14,7 @@ routes.get("/products", adminController.getProducts);
 // reach under /admin/add-product => POST
 routes.post("/add-product", adminController.postAddProduct);
 
-// routes.get("/edit-product/:productId", adminController.getEditProduct);
+routes.get("/edit-product/:productId", adminController.getEditProduct);
 
 // this route is to update the product
 routes.post('/edit-product', adminController.postEditProduct);

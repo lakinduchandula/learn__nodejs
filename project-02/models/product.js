@@ -1,21 +1,34 @@
-const mongodb = require('mongodb');
+const mongodb = require("mongodb");
 
 // 3rd party custom libraries
 const getDb = require("../utils/database").getDb;
 
 class Product {
-  constructor(title, imageUrl, description, price) {
+  constructor(title, imageUrl, description, price, _id) {
     this.title = title;
     this.imageUrl = imageUrl;
     this.price = price;
     this.description = description;
+    this._id = _id;
   }
 
   save() {
     const db = getDb(); // get database attached to node appication
-    return db
-      .collection("products") //  make collection to save data
-      .insertOne(this) // inserting the object
+    let dpOp; // set the database operation
+
+    // check whether this._id is exist or not and make the decision update or
+    // insert new product to the database
+    if (this._id) {
+      /** this line we can mention all the attributes insted of "this" **/
+      dpOp = db
+        .collection("products")
+        .updateOne({ _id: new mongodb.ObjectId(this._id) }, { $set: this });
+    } else {
+      dbOp = db
+        .collection("products") //  make collection to save data
+        .insertOne(this); // inserting the object
+    }
+    return dpOp
       .then(result => {
         console.log(result); // run if process succeeded
       })
@@ -30,7 +43,6 @@ class Product {
      * because sometimes it can be have millions of documents in the collection, *
      * so sending all data through wire at once is not a good practice           *
      *****************************************************************************/
-    console.log("At Product model");
     const db = getDb(); // get database attached to node appication
     return db
       .collection("products")

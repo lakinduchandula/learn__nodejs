@@ -1,3 +1,6 @@
+const mongodb = require("mongodb");
+
+//3rd party libraries
 const Product = require("../models/product");
 
 // export this get method add product middleware func
@@ -41,34 +44,46 @@ exports.getEditProduct = (req, res, next) => {
   if (!editMode) {
     return res.redirect("/");
   }
-  Product.findById(productId, product => {
-    res.render("admin/edit-product", {
-      pageTitle: "Edit Product",
-      path: "/admin/edit-product",
-      editing: editMode,
-      product: product,
+  Product.findById(productId)
+    .then(product => {
+      res.render("admin/edit-product", {
+        pageTitle: "Edit Product",
+        path: "/admin/edit-product",
+        editing: editMode,
+        product: product,
+      });
+    })
+    .catch(err => {
+      console.log(err);
     });
-  });
 };
 
 exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.productId; // get prodId from hidden input
 
   // extract the data from request.body
-  const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
-  const description = req.body.description;
-  const price = req.body.price;
+  const updatedTitle = req.body.title;
+  const updatedImageUrl = req.body.imageUrl;
+  const updatedDescription = req.body.description;
+  const updatedPrice = req.body.price;
 
-  const UpdatedProduct = new Product(
-    prodId,
-    title,
-    imageUrl,
-    description,
-    price
+  const product = new Product(
+    updatedTitle,
+    updatedImageUrl,
+    updatedDescription,
+    updatedPrice,
+    new mongodb.ObjectId(prodId)
   );
-  UpdatedProduct.save();
-  res.redirect("/admin/products");
+
+  product
+    .save()
+    .then(result => {
+      res.redirect("/admin/products");
+      console.log("Product Updated!");
+    })
+    .catch(err => {
+      console.log(err);
+    });
 };
 
 exports.postDeleteProduct = (req, res, next) => {
@@ -78,11 +93,15 @@ exports.postDeleteProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll(products => {
-    res.render("admin/products", {
-      prods: products,
-      pageTitle: "Admin Products",
-      path: "/admin/products",
+  Product.fetchAll()
+    .then(products => {
+      res.render("admin/products", {
+        prods: products,
+        pageTitle: "Admin Products",
+        path: "/admin/products",
+      });
+    })
+    .catch(err => {
+      console.log(err);
     });
-  });
 };

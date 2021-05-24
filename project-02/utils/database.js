@@ -9,7 +9,7 @@ const mongoConnect = callback => {
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
     .then(client => {
-      console.log("Connected!");
+      console.log("Connected! to MongoDB Atlas");
       _db = client.db();
       callback();
     })
