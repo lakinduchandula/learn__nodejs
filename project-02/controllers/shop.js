@@ -69,7 +69,8 @@ exports.getCart = (req, res, next) => {
 
 exports.postCartDelete = (req, res, next) => {
   const prodId = req.body.productId;
-  req.user.deleteItemFromCart(prodId)
+  req.user
+    .deleteItemFromCart(prodId)
     .then(result => {
       res.redirect("/cart");
     })
@@ -95,10 +96,30 @@ exports.postCart = (req, res, next) => {
 
 // Order Page Controller
 exports.getOrders = (req, res, next) => {
-  res.render("shop/orders", {
-    path: "/orders",
-    pageTitle: "Your Orders",
-  });
+  req.user
+    .getOrders()
+    .then(orders => {
+      res.render("shop/orders", {
+        path: "/orders",
+        pageTitle: "Your Orders",
+        orders: orders
+      });
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
+
+// post orders
+exports.postOrders = (req, res, next) => {
+  req.user
+    .addOrder()
+    .then(result => {
+      res.redirect("/orders");
+    })
+    .catch(err => {
+      console.log(err);
+    });
 };
 
 // Checkout Page Controller

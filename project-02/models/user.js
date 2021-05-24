@@ -24,6 +24,42 @@ class User {
       });
   }
 
+  addOrder() {
+    const db = getDb(); // get database attached to node appication
+    return this.getCart()
+      .then(products => {
+        const order = {
+          items: products,
+          user: {
+            _id: new mongodb.ObjectId(this._id),
+            name: this.name,
+          },
+        };
+        return db.collection("orders").insertOne(order);
+      })
+      .then(result => {
+        this.cart = { items: [] }; // remove from user object
+        return db.collection("users").updateOne(
+          { _id: new mongodb.ObjectId(this._id) },
+          { $set: { cart: { items: [] } } } // remove from database
+        );
+      });
+  }
+
+  getOrders() {
+    const db = getDb();
+    return db
+      .collection("orders")
+      .find({ "user._id": new mongodb.ObjectId(this._id) })
+      .toArray()
+      .then(orders => {
+        return orders;
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+
   addToCart(product) {
     const cartProductIndex = this.cart.items.findIndex(cp => {
       return cp.productId.toString() === product._id.toString();
@@ -58,12 +94,11 @@ class User {
     });
     const db = getDb();
     return db
-    .collection("users")
-    .updateOne(
-      { _id: new mongodb.ObjectId(this._id) },
-      { $set: { cart: {items: updatedCartItem} } }
-    );
-
+      .collection("users")
+      .updateOne(
+        { _id: new mongodb.ObjectId(this._id) },
+        { $set: { cart: { items: updatedCartItem } } }
+      );
   }
 
   getCart() {
