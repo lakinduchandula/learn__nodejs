@@ -40,7 +40,6 @@ exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
   Product.findById(prodId)
     .then(product => {
-      console.log(product);
       res.render("shop/product-detail", {
         path: "/products", // which navigation should highlight
         pageTitle: product.title, // which page title should display
@@ -93,7 +92,7 @@ exports.postCart = (req, res, next) => {
       req.user.addToCart(product);
     })
     .then(result => {
-      console.log(result);
+      //console.log(result);
     })
     .catch(err => {
       console.log(err);

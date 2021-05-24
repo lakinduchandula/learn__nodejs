@@ -17,7 +17,7 @@ class User {
       .collection("users")
       .insertOne(this)
       .then(result => {
-        console.log(result);
+        //console.log(result);
       })
       .catch(error => {
         console.log(error);
@@ -25,27 +25,31 @@ class User {
   }
 
   addToCart(product) {
-    const db = getDb(); // get database attached to node appication
-    // const cartProduct = this.cart.items.findIndex(cp => {
-    //   cp._id === mongodb.ObjectId(product._id);
-    // });
+    const cartProductIndex = this.cart.items.findIndex(cp => {
+      return cp.productId.toString() === product._id.toString();
+    });
+    let newQuantity = 1;
+    const updatedCartItems = [...this.cart.items];
 
-    // let's assume this is for a new cart and thereis no products in it
-    const updatedCart = {
-      items: [{ productId: new mongodb.ObjectId(product._id), quantity: 1 }],
-    };
-    return db
-      .collection("users")
-      .updateOne(
-        { _id: new mongodb.ObjectID(this._id) },
-        { $set: { cart: updatedCart } }
-      )
-      .then(() => {
-        console.log("Cart Updated Successfuly!");
-      })
-      .catch(err => {
-        console.log(err);
+    if (cartProductIndex >= 0) {
+      newQuantity = this.cart.items[cartProductIndex].quantity + 1;
+      updatedCartItems[cartProductIndex].quantity = newQuantity;
+    } else {
+      updatedCartItems.push({
+        productId: new mongodb.ObjectId(product._id),
+        quantity: newQuantity
       });
+    }
+    const updatedCart = {
+      items: updatedCartItems
+    };
+    const db = getDb();
+    return db
+      .collection('users')
+      .updateOne(
+        { _id: new mongodb.ObjectId(this._id) },
+        { $set: { cart: updatedCart } }
+      );
   }
 
   static findById(userId) {
