@@ -1,3 +1,28 @@
+const mongoose = require("mongoose");
+
+const Schema = mongoose.Schema;
+
+const productSchema = new Schema({
+  title: {
+    type: String, // data type of title
+    require: true, // true means we must insert title for every product
+  },
+  price: {
+    type: Number,
+    require: true,
+  },
+  description: {
+    type: String,
+    require: true,
+  },
+  imageUrl: {
+    type: String,
+    require: true,
+  },
+});
+
+module.exports = mongoose.model('Product', productSchema);
+
 // const mongodb = require("mongodb");
 
 // // 3rd party custom libraries

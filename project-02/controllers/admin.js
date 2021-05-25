@@ -20,16 +20,14 @@ exports.postAddProduct = (req, res, next) => {
   const description = req.body.description;
   const price = req.body.price;
 
-  const product = new Product(
-    title,
-    imageUrl,
-    description,
-    price,
-    null,
-    mongodb.ObjectId(req.user._id)
-  );
+  const product = new Product({ // object will be a reference to the productSchema
+    title: title,
+    description: description,
+    price: price,
+    imageUrl: imageUrl,
+  });
   product
-    .save()
+    .save() // save method is already built inside mongoose
     .then(result => {
       console.log("Product Created!");
       res.redirect("/admin/products");

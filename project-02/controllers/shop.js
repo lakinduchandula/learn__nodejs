@@ -4,7 +4,11 @@ const Cart = require("../models/cart");
 // export this get methods shop product middleware func
 exports.getProducts = (req, res, next) => {
   // directly call to static func through class name Product
-  Product.fetchAll()
+  /*************************************** NOTE *************************************
+   * find() method is inside of mongoose so it will give all product but it didn't  *
+   * give the cursor back, but if we nedd .cursor() we can use .next() as well      *
+   **********************************************************************************/
+  Product.find()
     .then(products => {
       res.render("shop/product-list", {
         prods: products,
@@ -19,7 +23,7 @@ exports.getProducts = (req, res, next) => {
 
 // Index Page Controller
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then(products => {
       res.render("shop/index", {
         prods: products,
@@ -33,10 +37,11 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getProduct = (req, res, next) => {
-  /********************************************** NOTE ***************************************************
-   * req.params can access the dynamic content after /products/:productId had,                           *
-   *  but in here very essential to same the name after : (productId) and the req.params (productId).    *
-   *******************************************************************************************************/
+  /********************************************** NOTE *****************************************************
+   * findById() method is inside of mongoose, we can pass string to it, it will convert to a ObjectId auto *
+   * req.params can access the dynamic content after /products/:productId had,                             *
+   * but in here very essential to same the name after : (productId) and the req.params (productId).       *
+   *********************************************************************************************************/
   const prodId = req.params.productId;
   Product.findById(prodId)
     .then(product => {
@@ -102,7 +107,7 @@ exports.getOrders = (req, res, next) => {
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Your Orders",
-        orders: orders
+        orders: orders,
       });
     })
     .catch(err => {

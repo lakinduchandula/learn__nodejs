@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 // custom (my own) libraries
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
-const User = require("./models/user");
+// const User = require("./models/user");
 
 // import controllers
 const pageNotFoundController = require("./controllers/404");
@@ -27,16 +27,16 @@ app.use(
   })
 );
 
-app.use((req, res, next) => {
-  User.findById("60ab59a2b3ccbe279141f972")
-    .then(user => {
-      req.user = new User(user.name, user.email, user.cart, user._id); // add the user to request so we can access it any where
-      next();
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
+// app.use((req, res, next) => {
+//   User.findById("60ab59a2b3ccbe279141f972")
+//     .then(user => {
+//       req.user = new User(user.name, user.email, user.cart, user._id); // add the user to request so we can access it any where
+//       next();
+//     })
+//     .catch(err => {
+//       console.log(err);
+//     });
+// });
 
 // this middleware function will give the access to the user to read our file system in public folder
 app.use(express.static(path.join(__dirname, "public")));
@@ -46,7 +46,7 @@ app.use(shopRoutes); // handling all shop routes
 
 app.use(pageNotFoundController.NotFoundPage);
 
-//
+
 mongoose
   .connect(
     "mongodb+srv://lakinduchandula:befUUaXreUAbXmSb@cluster0.fjhfb.mongodb.net/shop?retryWrites=true&w=majority", // srv string to connect mongodb atlas
