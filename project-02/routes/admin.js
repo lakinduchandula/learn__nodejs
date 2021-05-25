@@ -7,18 +7,18 @@ const routes = express.Router();
 // reach under /admin/add-product => GET
 routes.get("/add-product", adminController.getAddProduct);
 
-// // reach under /admin/product => GET
-// routes.get("/products", adminController.getProducts);
+// reach under /admin/product => GET
+routes.get("/products", adminController.getProducts);
 
 // app.post mean it will only run under post method
 // reach under /admin/add-product => POST
 routes.post("/add-product", adminController.postAddProduct);
 
-// routes.get("/edit-product/:productId", adminController.getEditProduct);
+routes.get("/edit-product/:productId", adminController.getEditProduct);
 
-// // this route is to update the product
-// routes.post('/edit-product', adminController.postEditProduct);
+// this route is to update the product
+routes.post('/edit-product', adminController.postEditProduct);
 
-// routes.post("/delete-product", adminController.postDeleteProduct)
+routes.post("/delete-product", adminController.postDeleteProduct)
 
 module.exports = routes;

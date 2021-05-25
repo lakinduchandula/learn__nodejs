@@ -20,7 +20,8 @@ exports.postAddProduct = (req, res, next) => {
   const description = req.body.description;
   const price = req.body.price;
 
-  const product = new Product({ // object will be a reference to the productSchema
+  const product = new Product({
+    // object will be a reference to the productSchema
     title: title,
     description: description,
     price: price,
@@ -72,19 +73,17 @@ exports.postEditProduct = (req, res, next) => {
   const updatedDescription = req.body.description;
   const updatedPrice = req.body.price;
 
-  const product = new Product(
-    updatedTitle,
-    updatedImageUrl,
-    updatedDescription,
-    updatedPrice,
-    new mongodb.ObjectId(prodId)
-  );
-
-  product
-    .save()
+  Product.findById(prodId)
+    .then(product => {
+      product.title = updatedTitle;
+      product.price = updatedPrice;
+      product.description = updatedDescription;
+      product.imageUrl = updatedImageUrl;
+      return product.save();
+    })
     .then(result => {
-      res.redirect("/admin/products");
       console.log("Product Updated!");
+      res.redirect("/admin/products");
     })
     .catch(err => {
       console.log(err);
@@ -93,7 +92,7 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const productId = req.body.productId;
-  Product.deleteById(productId)
+  Product.findByIdAndRemove(productId) // findByIdAndRemoved is mongoose method
     .then(result => {
       console.log("Product Deleted!");
       res.redirect("/admin/products");
@@ -104,7 +103,7 @@ exports.postDeleteProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then(products => {
       res.render("admin/products", {
         prods: products,
