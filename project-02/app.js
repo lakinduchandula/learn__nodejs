@@ -2,11 +2,11 @@ const path = require("path");
 
 // 3rd party libraries
 const express = require("express");
+const mongoose = require("mongoose");
 
 // custom (my own) libraries
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
-const mongoConnect = require("./utils/database").mongoConnect;
 const User = require("./models/user");
 
 // import controllers
@@ -46,7 +46,17 @@ app.use(shopRoutes); // handling all shop routes
 
 app.use(pageNotFoundController.NotFoundPage);
 
-mongoConnect(() => {
-  // call the database fuction in util/database.js have
-  app.listen(3000); // this will do both creating server and listen on port 3000
-});
+//
+mongoose
+  .connect(
+    "mongodb+srv://lakinduchandula:befUUaXreUAbXmSb@cluster0.fjhfb.mongodb.net/shop?retryWrites=true&w=majority", // srv string to connect mongodb atlas
+    { useNewUrlParser: true, useUnifiedTopology: true } 
+  )
+  .then(response => {
+    console.log('Connected to Mongodb Atlas!')
+    //console.log(response);
+    app.listen(3000);
+  })
+  .catch(err => {
+    console.log(err);
+  });
