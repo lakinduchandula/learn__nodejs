@@ -104,8 +104,7 @@ exports.postCart = (req, res, next) => {
 
 // Order Page Controller
 exports.getOrders = (req, res, next) => {
-  req.user
-    .getOrders()
+  Order.find({ "user.userId": req.user._id })
     .then(orders => {
       res.render("shop/orders", {
         path: "/orders",
@@ -125,9 +124,8 @@ exports.postOrders = (req, res, next) => {
     .execPopulate() // populate not return promise by default therefore -> execPopulate
     .then(user => {
       const products = user.cart.items.map(i => {
-        return { product: i.product._id, quantity: i.quantity };
+        return { quantity: i.quantity, product: { ...i.product._doc } };
       });
-      
       const order = new Order({
         products: products,
         user: {
@@ -135,9 +133,12 @@ exports.postOrders = (req, res, next) => {
           name: req.user.name,
         },
       });
-      order.save()
+      order.save();
     })
-    .then(result => {
+    .then(() => {
+      return req.user.clearCart();
+    })
+    .then(() => {
       res.redirect("/orders");
     })
     .catch(err => {

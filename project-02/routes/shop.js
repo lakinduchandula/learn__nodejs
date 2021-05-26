@@ -25,7 +25,7 @@ router.post("/cart", shopController.postCart);
 **************************************************************************************/
 router.get('/products/:productId', shopController.getProduct);
 
-// router.get("/orders", shopController.getOrders);
+router.get("/orders", shopController.getOrders);
 
 router.post('/create-order', shopController.postOrders);
 
