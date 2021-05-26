@@ -26,6 +26,7 @@ exports.postAddProduct = (req, res, next) => {
     description: description,
     price: price,
     imageUrl: imageUrl,
+    userId: req.user, // we stored user in request mongoose will only get _id when we send the entire user model
   });
   product
     .save() // save method is already built inside mongoose
