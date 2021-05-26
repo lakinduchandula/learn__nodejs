@@ -1,5 +1,5 @@
 const Product = require("../models/product");
-const Cart = require("../models/cart");
+const Order = require("../models/order");
 
 // export this get methods shop product middleware func
 exports.getProducts = (req, res, next) => {
@@ -59,8 +59,11 @@ exports.getProduct = (req, res, next) => {
 // Cart Page Controller
 exports.getCart = (req, res, next) => {
   req.user
-    .getCart()
-    .then(products => {
+    .populate("cart.items.product") // this will specifically return the prod doc
+    .execPopulate() // populate not return promise by default therefore -> execPopulate
+    .then(user => {
+      const products = user.cart.items;
+      // console.log('getCART products ==>' , user.cart.items)
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",
@@ -118,7 +121,22 @@ exports.getOrders = (req, res, next) => {
 // post orders
 exports.postOrders = (req, res, next) => {
   req.user
-    .addOrder()
+    .populate("cart.items.product") // this will specifically return the prod doc
+    .execPopulate() // populate not return promise by default therefore -> execPopulate
+    .then(user => {
+      const products = user.cart.items.map(i => {
+        return { product: i.product._id, quantity: i.quantity };
+      });
+      
+      const order = new Order({
+        products: products,
+        user: {
+          userId: req.user,
+          name: req.user.name,
+        },
+      });
+      order.save()
+    })
     .then(result => {
       res.redirect("/orders");
     })

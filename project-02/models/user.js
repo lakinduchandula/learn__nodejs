@@ -14,8 +14,9 @@ const userSchema = new Schema({
   cart: {
     items: [
       {
-        productId: {
+        product: {
           type: Schema.Types.ObjectId,
+          ref: "Product",
           required: true,
         },
         quantity: {
@@ -27,7 +28,42 @@ const userSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model('User', userSchema);
+// this is my own method work with mongoose
+userSchema.methods.addToCart = function (product) {
+  const cartProductIndex = this.cart.items.findIndex(cp => {
+    // cart: { items: [{product: prodcutId and this ref to entire product doc, quantity: value}] }
+    // cp.product means the productId
+    return cp.product.toString() === product._id.toString();
+  });
+  const updatedCartItems = [...this.cart.items];
+
+  if (cartProductIndex >= 0) {
+    this.cart.items[cartProductIndex].quantity += 1;
+  } else {
+    updatedCartItems.push({
+      product: product._id, // product._id will auto-convert to ObjectId by mongoose
+      quantity: 1,
+    });
+  }
+  const updatedCart = {
+    items: updatedCartItems,
+  };
+
+  this.cart = updatedCart;
+  return this.save(); // save() is built-in method in mongoose
+};
+
+userSchema.methods.deleteItemFromCart = function (productId) {
+  // cart: { items: [{product: prodcutId and this ref to entire product doc, quantity: value}] }
+  // cartItem.product means the productId
+  const updatedCartItem = this.cart.items.filter(cartItem => {
+    return cartItem.product.toString() !== productId.toString();
+  });
+  this.cart.items = updatedCartItem;
+  return this.save(); // save() is built-in method in mongoose
+};
+
+module.exports = mongoose.model("User", userSchema);
 
 // const mongodb = require("mongodb");
 
