@@ -7,6 +7,8 @@ const mongoose = require("mongoose");
 // custom (my own) libraries
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
+const authRoutes = require("./routes/auth");
+
 const User = require("./models/user");
 
 // import controllers
@@ -43,6 +45,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/admin", adminRoutes); // handling all admin routes
 app.use(shopRoutes); // handling all shop routes
+app.use(authRoutes); // handling all auth routes
 
 app.use(pageNotFoundController.NotFoundPage);
 
@@ -63,8 +66,8 @@ mongoose
         user.save(); // save the user
       }
     });
-    // mongodb connected msg 
-    console.log('Connected to Mongodb Atlas!')
+    // mongodb connected msg
+    console.log("Connected to Mongodb Atlas!");
     // setup the server to listen on port 3000
     app.listen(3000);
   })

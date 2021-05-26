@@ -1,5 +1,3 @@
-const mongodb = require("mongodb");
-
 //3rd party libraries
 const Product = require("../models/product");
 
