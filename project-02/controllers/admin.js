@@ -105,6 +105,13 @@ exports.postDeleteProduct = (req, res, next) => {
 
 exports.getProducts = (req, res, next) => {
   Product.find()
+  /*************************************** SIDE NOTE ********************************************
+   * through -> .select() this will allow us to which filed that we need to select or unselect  *
+   * through -> populate() this will allow us to fetch specified data                           *
+   * select can control the fileds of main and populated documents also..                       *
+   **********************************************************************************************/
+  //.select('title price -_id') // need title and price but not need _id so pit - infront field name
+  //.populate('userId', 'name') // write the filed name inside 'field name'
     .then(products => {
       res.render("admin/products", {
         prods: products,
