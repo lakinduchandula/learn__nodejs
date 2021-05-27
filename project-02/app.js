@@ -1,9 +1,10 @@
 const path = require("path");
-const session = require("express-session");
 
 // 3rd party libraries
 const express = require("express");
 const mongoose = require("mongoose");
+const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session); // pass the argument to fucntion
 
 // custom (my own) libraries
 const adminRoutes = require("./routes/admin");
@@ -12,10 +13,18 @@ const authRoutes = require("./routes/auth");
 
 const User = require("./models/user");
 
+// constants
+const MONGODB_URI =
+  "mongodb+srv://lakinduchandula:befUUaXreUAbXmSb@cluster0.fjhfb.mongodb.net/shop"; 
+
 // import controllers
 const pageNotFoundController = require("./controllers/404");
 
 const app = express(); // this express will handle almost very thing in behind the scenes
+const store = new MongoDBStore({
+  uri: MONGODB_URI, // uri mongodb
+  collection: "sessions", // which collection to store sessions
+});
 
 app.set("view engine", "ejs"); // this will setup ejs as the template engine
 
@@ -36,6 +45,7 @@ app.use(
     secret: "long-string-in-prodction-level!", // this will normaly a long string
     resave: false, // not save for every incoming req or res that we send, unless content is not changed
     saveUninitialized: false, // this will also basically give the same meaning as resave
+    store: store, // MongoDBStore variable (store)
   })
 );
 
@@ -61,7 +71,7 @@ app.use(pageNotFoundController.NotFoundPage);
 
 mongoose
   .connect(
-    "mongodb+srv://lakinduchandula:befUUaXreUAbXmSb@cluster0.fjhfb.mongodb.net/shop?retryWrites=true&w=majority", // srv string to connect mongodb atlas
+    MONGODB_URI, // srv string to connect mongodb atlas
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(response => {
