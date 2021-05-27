@@ -1,4 +1,5 @@
 const path = require("path");
+const session = require("express-session");
 
 // 3rd party libraries
 const express = require("express");
@@ -26,6 +27,15 @@ app.use(
   express.urlencoded({
     // this will help to catch the body in express package
     extended: true,
+  })
+);
+
+// session middleware
+app.use(
+  session({
+    secret: "long-string-in-prodction-level!", // this will normaly a long string
+    resave: false, // not save for every incoming req or res that we send, unless content is not changed
+    saveUninitialized: false, // this will also basically give the same meaning as resave
   })
 );
 
