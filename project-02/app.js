@@ -78,17 +78,6 @@ mongoose
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(response => {
-    User.findOne().then(user => {
-      if (!user) {
-        // create a user
-        const user = new User({
-          name: "lakinduchandula",
-          email: "lakinduchandula@test.lk",
-          cart: { items: [] },
-        });
-        user.save(); // save the user
-      }
-    });
     // mongodb connected msg
     console.log("Connected to Mongodb Atlas!");
     // setup the server to listen on port 3000
