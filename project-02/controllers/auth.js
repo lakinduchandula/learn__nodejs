@@ -7,6 +7,7 @@ exports.getLogin = (req, res, next) => {
     path: "/login",
     pageTitle: "Login",
     isAuthenticated: false,
+    errorMessage: req.flash("Error-Invalid Credentials"),
   });
 };
 
@@ -15,6 +16,7 @@ exports.getSignup = (req, res, next) => {
     path: "/signup",
     pageTitle: "Signup",
     isAuthenticated: false,
+    errorMessage: req.flash("Error-Registerd Credentials"),
   });
 };
 
@@ -24,6 +26,11 @@ exports.postLogin = (req, res, next) => {
   User.findOne({ email: email })
     .then(user => {
       if (!user) {
+        // send the feedback to user
+        req.flash(
+          "Error-Invalid Credentials",
+          "Invalid Credentials please try again!"
+        );
         return res.redirect("/login");
       }
       bcryptjs
@@ -33,11 +40,17 @@ exports.postLogin = (req, res, next) => {
             req.session.isLoggedIn = true;
             console.log("Authenticated!");
             req.session.user = user;
-            return req.session.save(err => { // executes when done save
+            return req.session.save(err => {
+              // executes when done save
               console.log(err);
               res.redirect("/");
             });
           }
+          // send the feedback to user
+          req.flash(
+            "Error-Invalid Credentials",
+            "Invalid Password please try again!"
+          );
           res.redirect("/login");
         });
     })
@@ -54,6 +67,10 @@ exports.postSignup = (req, res, next) => {
   User.findOne({ email: email })
     .then(userDoc => {
       if (userDoc) {
+        req.flash(
+          "Error-Registerd Credentials",
+          "Email that you've entered is already taken! Signup with different one."
+        );
         return res.redirect("/signup");
       }
       return bcryptjs

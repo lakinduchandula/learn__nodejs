@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session); // pass the argument to fucntion
 const csrf = require("csurf");
+const flash = require("connect-flash");
 
 // custom (my own) libraries
 const adminRoutes = require("./routes/admin");
@@ -27,7 +28,11 @@ const store = new MongoDBStore({
   collection: "sessions", // which collection to store sessions
 });
 
+// initialize cross-site-register-forgery Protectoin String
 const csrfProtection = csrf();
+
+// flash register so we can use it on evey request accross the all files
+app.use(flash()); // call it as a function
 
 // this middleware function will give the access to the user to read our file system in public folder
 app.use(express.static(path.join(__dirname, "public")));
