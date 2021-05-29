@@ -58,7 +58,6 @@ exports.getEditProduct = (req, res, next) => {
         editing: editMode,
         product: product,
         isAuthenticated: req.session.isLoggedIn,
-        
       });
     })
     .catch(err => {

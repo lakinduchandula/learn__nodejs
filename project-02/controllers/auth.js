@@ -19,16 +19,27 @@ exports.getSignup = (req, res, next) => {
 };
 
 exports.postLogin = (req, res, next) => {
-  User.findById("60aca09b101bd941fcaf5e84")
+  const email = req.body.email;
+  const password = req.body.password;
+  User.findOne({ email: email })
     .then(user => {
-      req.session.isLoggedIn = true;
-      console.log("Authenticated!");
-      req.session.user = user;
-      req.session.save(err => {
-        // executes when done save
-        console.log(err);
-        res.redirect("/");
-      });
+      if (!user) {
+        return res.redirect("/login");
+      }
+      bcryptjs
+        .compare(password, user.password) // 1st argument is the password, 2nd is hashed value
+        .then(doMatch => {
+          if (doMatch) {
+            req.session.isLoggedIn = true;
+            console.log("Authenticated!");
+            req.session.user = user;
+            return req.session.save(err => { // executes when done save
+              console.log(err);
+              res.redirect("/");
+            });
+          }
+          res.redirect("/login");
+        });
     })
     .catch(err => {
       console.log(err);
