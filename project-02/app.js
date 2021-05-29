@@ -5,6 +5,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session); // pass the argument to fucntion
+const csrf = require("csurf");
 
 // custom (my own) libraries
 const adminRoutes = require("./routes/admin");
@@ -15,7 +16,7 @@ const User = require("./models/user");
 
 // constants
 const MONGODB_URI =
-  "mongodb+srv://lakinduchandula:befUUaXreUAbXmSb@cluster0.fjhfb.mongodb.net/shop"; 
+  "mongodb+srv://lakinduchandula:befUUaXreUAbXmSb@cluster0.fjhfb.mongodb.net/shop";
 
 // import controllers
 const pageNotFoundController = require("./controllers/404");
@@ -25,6 +26,11 @@ const store = new MongoDBStore({
   uri: MONGODB_URI, // uri mongodb
   collection: "sessions", // which collection to store sessions
 });
+
+const csrfProtection = csrf();
+
+// this middleware function will give the access to the user to read our file system in public folder
+app.use(express.static(path.join(__dirname, "public")));
 
 app.set("view engine", "ejs"); // this will setup ejs as the template engine
 
@@ -49,8 +55,10 @@ app.use(
   })
 );
 
+app.use(csrfProtection); // add csrf(); to middleware chain
+
 app.use((req, res, next) => {
-  if(!req.session.user){
+  if (!req.session.user) {
     return next();
   }
   User.findById(req.session.user._id)
@@ -63,8 +71,13 @@ app.use((req, res, next) => {
     });
 });
 
-// this middleware function will give the access to the user to read our file system in public folder
-app.use(express.static(path.join(__dirname, "public")));
+// this is the ideal place to place the csrfprotection and isLoggedIn middelware
+// before the routes and after the user authentication
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken();
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  next();
+});
 
 app.use("/admin", adminRoutes); // handling all admin routes
 app.use(shopRoutes); // handling all shop routes
