@@ -20,4 +20,6 @@ routes.get("/reset/:token", authController.getNewPassword);
 
 routes.post("/reset", authController.postReset);
 
+routes.post("/new-password", authController.postNewPassword);
+
 module.exports = routes;

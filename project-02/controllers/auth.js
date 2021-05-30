@@ -185,10 +185,54 @@ exports.getNewPassword = (req, res, next) => {
           pageTitle: "Reset Password",
           errorMessage: req.flash("error"),
           userId: user._id.toString(),
+          passwordToken: token,
         });
       }
     })
     .catch(err => {
       console.log(err);
+    });
+};
+
+exports.postNewPassword = (req, res, next) => {
+  const userId = req.body.userId;
+  const passwordToken = req.body.passwordToken;
+  const newPassword = req.body.password;
+  let resetUser;
+  let userMail;
+
+  User.findOne({
+    resetToken: passwordToken,
+    restTokenExpiration: { $gt: Date.now() },
+    _id: userId,
+  })
+    .then(user => {
+      resetUser = user;
+      userMail = user.email;
+      return bcryptjs.hash(newPassword, 12);
+    })
+    .then(encryptedPassword => {
+      resetUser.password = encryptedPassword;
+      resetToken = undefined;
+      restTokenExpiration = undefined;
+      return resetUser.save();
+    })
+    .then(result => {
+      res.redirect("/login");
+      transporter.sendMail({
+        from: '"Admin 👻" <projects.lakinduchandula@outlook.com>', // sender address
+        to: userMail, // receiver
+        subject: "Password Reset Successfully ✔", // Subject line
+        text: "Your password has been successfully updated to a new one", // plain text body
+        html: `
+          <p> Click this link for login</p>
+          <a href="http://localhost:3000/login">Click Here</a>
+          <hr>
+          <p> This email by admin </p>
+          `, // html body
+      });
+    })
+    .catch(err => {
+      console.error(err);
     });
 };
