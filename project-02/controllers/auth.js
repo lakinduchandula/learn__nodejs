@@ -213,8 +213,8 @@ exports.postNewPassword = (req, res, next) => {
     })
     .then(encryptedPassword => {
       resetUser.password = encryptedPassword;
-      resetToken = undefined;
-      restTokenExpiration = undefined;
+      resetUser.resetToken = undefined;
+      resetUser.restTokenExpiration = undefined;
       return resetUser.save();
     })
     .then(result => {
