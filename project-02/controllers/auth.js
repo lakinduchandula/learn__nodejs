@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const bcryptjs = require("bcryptjs");
 const nodemailer = require("nodemailer");
 
@@ -123,7 +124,53 @@ exports.getReset = (req, res, next) => {
   res.render("auth/reset", {
     path: "/reset",
     pageTitle: "Reset Password",
-    isAuthenticated: false,
-    errorMessage: req.flash("Error-Registerd Credentials"),
+    errorMessage: req.flash("error"),
+  });
+};
+
+exports.postReset = (req, res, next) => {
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      console.log(err);
+      return res.redirect("/");
+    }
+
+    // 'hex' mean that value need to convert hex values to normal ascii characters
+    const token = buffer.toString("hex");
+
+    User.findOne({ email: req.body.email })
+      .then(user => {
+        if (!user) {
+          req.flash(
+            "Error-Reset-Email-Not-Found",
+            "No account found! for that Email"
+          );
+          return res.redirect("/reset");
+        }
+
+        user.resetToken = token;
+        user.restTokenExpiration = Date.now() + 3600000; // 3600000 in miliseconds
+        return user.save(); //  save the current state to db
+      })
+      .then(result => {
+        if (result) {
+          res.redirect("/");
+          transporter.sendMail({
+            from: '"Admin 👻" <projects.lakinduchandula@outlook.com>', // sender address
+            to: req.body.email, // receiver
+            subject: "Password Reset ❗️", // Subject line
+            text: "You Request to reset the password you can do it by this following link", // plain text body
+            html: `
+              <p> Click this link for new password this will only valid for an hour by now </p>
+              <a href="http://localhost:3000/reset/${token}">Click Here</a>
+              <hr>
+              <p> This email by admin </p>
+              `, // html body
+          });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
   });
 };

@@ -15,6 +15,8 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  resetToken: String,         // this only there for requested reset email token verification
+  resetTokenExpiration: Date,  // this only there for requested reset email token verification
   cart: {
     items: [
       {
