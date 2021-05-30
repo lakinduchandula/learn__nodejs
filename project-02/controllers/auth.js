@@ -1,6 +1,17 @@
 const bcryptjs = require("bcryptjs");
+const nodemailer = require("nodemailer");
 
 const User = require("../models/user");
+
+const transporter = nodemailer.createTransport({
+  host: "smtp-mail.outlook.com",
+  port: 587,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: "projects.lakinduchandula@outlook.com", // generated ethereal user
+    pass: "testing@123", // generated ethereal password
+  },
+})
 
 exports.getLogin = (req, res, next) => {
   res.render("auth/login", {
@@ -86,6 +97,13 @@ exports.postSignup = (req, res, next) => {
         .then(result => {
           console.log("<<<  == New User Created! ==  >>>");
           res.redirect("/login");
+          return transporter.sendMail({
+            from: '"Admin 👻" <projects.lakinduchandula@outlook.com>', // sender address
+            to: email, // list of receivers
+            subject: "Signup Success ✔", // Subject line
+            text: "Signup Succeed!", // plain text body
+            html: "<p>You are successfully signed up and enjoy shopping!</p>", // html body
+          });
         });
     })
     .catch(err => {
