@@ -76,15 +76,17 @@ exports.postEditProduct = (req, res, next) => {
 
   Product.findById(prodId)
     .then(product => {
+      if (product.userId.toString() !== req.user._id.toString()) {
+        return res.redirect("/");
+      }
       product.title = updatedTitle;
       product.price = updatedPrice;
       product.description = updatedDescription;
       product.imageUrl = updatedImageUrl;
-      return product.save();
-    })
-    .then(result => {
-      console.log("Product Updated!");
-      res.redirect("/admin/products");
+      return product.save().then(result => {
+        console.log("Product Updated!");
+        res.redirect("/admin/products");
+      });
     })
     .catch(err => {
       console.log(err);
@@ -93,7 +95,7 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const productId = req.body.productId;
-  Product.findByIdAndRemove(productId) // findByIdAndRemoved is mongoose method
+  Product.deleteOne({ _id: productId, userId: req.user._id }) // findByIdAndRemoved is mongoose method
     .then(result => {
       console.log("Product Deleted!");
       res.redirect("/admin/products");
@@ -104,7 +106,7 @@ exports.postDeleteProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  Product.find({ userId: req.user._id })
     /*************************************** SIDE NOTE ********************************************
      * through -> .select() this will allow us to which filed that we need to select or unselect  *
      * through -> populate() this will allow us to fetch specified data                           *
