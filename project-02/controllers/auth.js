@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
     user: "projects.lakinduchandula@outlook.com", // generated ethereal user
     pass: "testing@123", // generated ethereal password
   },
-})
+});
 
 exports.getLogin = (req, res, next) => {
   res.render("auth/login", {
@@ -116,5 +116,14 @@ exports.postLogout = (req, res, next) => {
     // arrow fucntion declare what happen when done destroy the session
     console.log(err);
     res.redirect("/");
+  });
+};
+
+exports.getReset = (req, res, next) => {
+  res.render("auth/reset", {
+    path: "/reset",
+    pageTitle: "Reset Password",
+    isAuthenticated: false,
+    errorMessage: req.flash("Error-Registerd Credentials"),
   });
 };
