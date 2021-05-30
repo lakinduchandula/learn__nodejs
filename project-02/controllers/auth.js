@@ -124,7 +124,7 @@ exports.getReset = (req, res, next) => {
   res.render("auth/reset", {
     path: "/reset",
     pageTitle: "Reset Password",
-    errorMessage: req.flash("error"),
+    errorMessage: req.flash("Error-Reset-Email-Not-Found"),
   });
 };
 
@@ -173,4 +173,22 @@ exports.postReset = (req, res, next) => {
         console.log(err);
       });
   });
+};
+
+exports.getNewPassword = (req, res, next) => {
+  const token = req.params.token;
+  User.findOne({ resetToken: token, restTokenExpiration: { $gt: Date.now() } })
+    .then(user => {
+      if (user) {
+        res.render("auth/new-password", {
+          path: "/new-password",
+          pageTitle: "Reset Password",
+          errorMessage: req.flash("error"),
+          userId: user._id.toString(),
+        });
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    });
 };
