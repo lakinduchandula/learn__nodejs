@@ -24,7 +24,13 @@ routes.post(
     check("email").isEmail().withMessage("Email is not valid"),
     body("password")
       .isLength({ min: 5, max: 12 })
-      .withMessage("Password must be long at least 5 characters")
+      .withMessage("Password must be long at least 5 characters"),
+    body("confirmPassword").custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error("Passwords mismatch!");
+      }
+      return true;
+    }),
   ],
   authController.postSignup
 );
