@@ -1,12 +1,16 @@
 //3rd party libraries
 const Product = require("../models/product");
 
+const { validationResult } = require("express-validator");
+
 // export this get method add product middleware func
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/edit-product", {
     pageTitle: "Add Product",
     path: "/admin/add-product",
     editing: false,
+    hasError: false,
+    errorMessage: [],
     // isAuthenticated: req.session.isLoggedIn,
   });
 };
@@ -18,6 +22,26 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const description = req.body.description;
   const price = req.body.price;
+
+  // pass all errors to req and check if there are any errors
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    console.error([errors.array()[0].msg]);
+    return res.status(422).render("admin/edit-product", {
+      pageTitle: "Add Product",
+      path: "/admin/edit-product",
+      editing: false,
+      hasError: true,
+      product: {
+        title: title,
+        imageUrl: imageUrl,
+        description: description,
+        price: price,
+      },
+      errorMessage: [errors.array()[0].msg],
+    });
+  }
 
   const product = new Product({
     // object will be a reference to the productSchema
@@ -57,6 +81,8 @@ exports.getEditProduct = (req, res, next) => {
         path: "/admin/edit-product",
         editing: editMode,
         product: product,
+        hasErr: false,
+        errorMessage: [],
         // isAuthenticated: req.session.isLoggedIn,
       });
     })
@@ -73,6 +99,27 @@ exports.postEditProduct = (req, res, next) => {
   const updatedImageUrl = req.body.imageUrl;
   const updatedDescription = req.body.description;
   const updatedPrice = req.body.price;
+
+  // pass all errors to req and check if there are any errors
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    console.error([errors.array()[0].msg]);
+    return res.status(422).render("admin/edit-product", {
+      pageTitle: "Edit Product",
+      path: "/admin/edit-product",
+      editing: true,
+      hasError: true,
+      product: {
+        title: updatedTitle,
+        imageUrl: updatedImageUrl,
+        description: updatedDescription,
+        price: updatedPrice,
+        _id: prodId,
+      },
+      errorMessage: [errors.array()[0].msg],
+    });
+  }
 
   Product.findById(prodId)
     .then(product => {

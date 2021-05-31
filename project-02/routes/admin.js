@@ -2,6 +2,7 @@ const adminController = require("../controllers/admin");
 const isAuthenticated = require("../middleware/isAuth");
 
 const express = require("express");
+const { body } = require("express-validator");
 
 const routes = express.Router();
 
@@ -14,13 +15,41 @@ routes.get("/products", isAuthenticated, adminController.getProducts);
 
 // app.post mean it will only run under post method
 // reach under /admin/add-product => POST
-routes.post("/add-product", isAuthenticated, adminController.postAddProduct);
+routes.post(
+  "/add-product",
+  [
+    body("title", "Validation Error on Title").isString().isLength({ min: 3 }).trim(),
+    body("imageUrl", "Validation Error on ImageUrl").isURL(),
+    body("price", "Validation Error on Price").isFloat(),
+    body("description", "Validation Error on Description").isLength({ min: 10, max: 200 }).trim(),
+  ],
+  isAuthenticated,
+  adminController.postAddProduct
+);
 
-routes.get("/edit-product/:productId", isAuthenticated, adminController.getEditProduct);
+routes.get(
+  "/edit-product/:productId",
+  isAuthenticated,
+  adminController.getEditProduct
+);
 
 // this route is to update the product
-routes.post("/edit-product", isAuthenticated, adminController.postEditProduct);
+routes.post(
+  "/edit-product",
+  [
+    body("title", "Validation Error on Title").isString().isLength({ min: 3 }),
+    body("imageUrl", "Validation Error on ImageUrl").isURL(),
+    body("price", "Validation Error on Price").isFloat(),
+    body("description", "Validation Error on Description").isLength({ min: 10, max: 200 }).trim(),
+  ],
+  isAuthenticated,
+  adminController.postEditProduct
+);
 
-routes.post("/delete-product", isAuthenticated, adminController.postDeleteProduct);
+routes.post(
+  "/delete-product",
+  isAuthenticated,
+  adminController.postDeleteProduct
+);
 
 module.exports = routes;
