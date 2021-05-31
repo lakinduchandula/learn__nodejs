@@ -17,7 +17,7 @@ const User = require("./models/user");
 
 // constants
 const MONGODB_URI =
-  "mongodb+srv://lakinduchandula:befUUaXreUAbXmSb@cluster0.fjhfb.mongodb.net/shop";
+  "mongodb+srv://online-shop-node-application:6C65rHM7bQbxsPPn@cluster0.fjhfb.mongodb.net/shop";
 
 // import controllers
 const pageNotFoundController = require("./controllers/404");
