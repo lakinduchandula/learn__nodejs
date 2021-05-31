@@ -1,6 +1,7 @@
 const crypto = require("crypto");
 const bcryptjs = require("bcryptjs");
 const nodemailer = require("nodemailer");
+const { validationResult } = require("express-validator");
 
 const User = require("../models/user");
 
@@ -75,6 +76,22 @@ exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const confirmPassword = req.body.confirmPassword;
+
+  /* if any erros are encountered from that middleware that we add on auth(routes)
+   file they will be stored at here and we can grab those errors */
+  const errors = validationResult(req);
+
+  // check any errors have
+  if (!errors.isEmpty()) {
+    // render the same page with validation error status code (422)
+    console.log(errors.array());
+    return res.status(422).render("auth/signup", {
+      path: "/signup",
+      pageTitle: "Signup",
+      isAuthenticated: false,
+      errorMessage: [errors.array()[0].msg],
+    });
+  }
 
   User.findOne({ email: email })
     .then(userDoc => {
