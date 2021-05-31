@@ -93,36 +93,26 @@ exports.postSignup = (req, res, next) => {
     });
   }
 
-  User.findOne({ email: email })
-    .then(userDoc => {
-      if (userDoc) {
-        req.flash(
-          "Error-Registerd Credentials",
-          "Email that you've entered is already taken! Signup with different one."
-        );
-        return res.redirect("/signup");
-      }
-      return bcryptjs
-        .hash(password, 12)
-        .then(encryptedPassword => {
-          const newUser = new User({
-            email: email,
-            password: encryptedPassword,
-            cart: { items: [] },
-          });
-          return newUser.save();
-        })
-        .then(result => {
-          console.log("<<<  == New User Created! ==  >>>");
-          res.redirect("/login");
-          return transporter.sendMail({
-            from: '"Admin 👻" <projects.lakinduchandula@outlook.com>', // sender address
-            to: email, // list of receivers
-            subject: "Signup Success ✔", // Subject line
-            text: "Signup Succeed!", // plain text body
-            html: "<p>You are successfully signed up and enjoy shopping!</p>", // html body
-          });
-        });
+  bcryptjs
+    .hash(password, 12)
+    .then(encryptedPassword => {
+      const newUser = new User({
+        email: email,
+        password: encryptedPassword,
+        cart: { items: [] },
+      });
+      return newUser.save();
+    })
+    .then(result => {
+      console.log("<<<  == New User Created! ==  >>>");
+      res.redirect("/login");
+      return transporter.sendMail({
+        from: '"Admin 👻" <projects.lakinduchandula@outlook.com>', // sender address
+        to: email, // list of receivers
+        subject: "Signup Success ✔", // Subject line
+        text: "Signup Succeed!", // plain text body
+        html: "<p>You are successfully signed up and enjoy shopping!</p>", // html body
+      });
     })
     .catch(err => {
       console.log(err);
