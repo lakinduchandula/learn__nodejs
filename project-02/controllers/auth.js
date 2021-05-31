@@ -21,6 +21,10 @@ exports.getLogin = (req, res, next) => {
     pageTitle: "Login",
     isAuthenticated: false,
     errorMessage: req.flash("Error-Invalid Credentials"),
+    oldInput: {
+      email: "",
+      password: "",
+    },
   });
 };
 
@@ -41,21 +45,21 @@ exports.getSignup = (req, res, next) => {
 exports.postLogin = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  const confirmPassword = req.body.confirmPassword;
+
+  const errors = validationResult(req);
 
   // check any errors have
   if (!errors.isEmpty()) {
     // render the same page with validation error status code (422)
     console.log(errors.array());
-    return res.status(422).render("auth/signup", {
-      path: "/signup",
-      pageTitle: "Signup",
+    return res.status(422).render("auth/login", {
+      path: "/login",
+      pageTitle: "Login",
       isAuthenticated: false,
       errorMessage: [errors.array()[0].msg],
       oldInput: {
         email: email,
         password: password,
-        confirmPassword: confirmPassword,
       },
     });
   }
@@ -63,12 +67,16 @@ exports.postLogin = (req, res, next) => {
   User.findOne({ email: email })
     .then(user => {
       if (!user) {
-        // send the feedback to user
-        req.flash(
-          "Error-Invalid Credentials",
-          "Invalid Credentials please try again!"
-        );
-        return res.redirect("/login");
+        return res.status(422).render("auth/login", {
+          path: "/login",
+          pageTitle: "Login",
+          isAuthenticated: false,
+          errorMessage: ['No user found for that email !'],
+          oldInput: {
+            email: email,
+            password: password,
+          },
+        });
       }
       bcryptjs
         .compare(password, user.password) // 1st argument is the password, 2nd is hashed value
@@ -84,11 +92,16 @@ exports.postLogin = (req, res, next) => {
             });
           }
           // send the feedback to user
-          req.flash(
-            "Error-Invalid Credentials",
-            "Invalid Password please try again!"
-          );
-          res.redirect("/login");
+          return res.status(422).render("auth/login", {
+            path: "/login",
+            pageTitle: "Login",
+            isAuthenticated: false,
+            errorMessage: ['Invalid Password please try again !'],
+            oldInput: {
+              email: email,
+              password: password,
+            },
+          });
         });
     })
     .catch(err => {
