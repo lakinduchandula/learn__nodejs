@@ -14,7 +14,17 @@ const routes = express.Router();
 
 routes.get("/login", authController.getLogin);
 
-routes.post("/login", authController.postLogin);
+routes.post(
+  "/login",
+  [
+    check("email")
+      .isEmail()
+      .normalizeEmail({all_lowercase: true, gmail_remove_dots: false})
+      .withMessage("Email is not valid!"),
+    body("password").isLength({ min: 5, max: 12 }).trim(),
+  ],
+  authController.postLogin
+);
 
 routes.post("/logout", authController.postLogout);
 
@@ -26,6 +36,7 @@ routes.post(
     check("email")
       .isEmail()
       .withMessage("Email is not valid")
+      .normalizeEmail({all_lowercase: true, gmail_remove_dots: false})
       .custom((value, { req }) => {
         return User.findOne({ email: value }).then(userDoc => {
           if (userDoc) {
@@ -36,14 +47,17 @@ routes.post(
         });
       }),
     body("password")
+      .trim()
       .isLength({ min: 5, max: 12 })
       .withMessage("Password must be long at least 5 characters"),
-    body("confirmPassword").custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error("Passwords mismatch!");
-      }
-      return true;
-    }),
+    body("confirmPassword")
+      .trim()
+      .custom((value, { req }) => {
+        if (value !== req.body.password) {
+          throw new Error("Passwords mismatch!");
+        }
+        return true;
+      }),
   ],
   authController.postSignup
 );
