@@ -63,6 +63,7 @@ app.use(
 app.use(csrfProtection); // add csrf(); to middleware chain
 
 app.use((req, res, next) => {
+  // throw new Error("This will detect by express because this throw is out side of promise in then or catch block");
   if (!req.session.user) {
     // check the session for perticular user
     return next();
@@ -77,7 +78,8 @@ app.use((req, res, next) => {
       next();
     })
     .catch(err => {
-      throw new Error(err);
+      // throw new Error(err); This will *** NOT DETECT *** by express because this throw is IN side of catch block
+      next(new Error(err)); // this will detect as a error and it will thow and handdle by middelware in line 106
     });
 });
 
@@ -103,7 +105,11 @@ app.use(errorController.get404);
 // and reach this special middlewhere
 app.use((error, req, res, next) => {
   // res.status(error.httpStatusCode).render(...);
-  res.redirect('/500');
+  res.status(500).render('500', {
+    pageTitle: 'Error!',
+    path: '/500',
+    isAuthenticated: req.session.isLoggedIn
+  });
 });
 
 
