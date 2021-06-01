@@ -19,7 +19,7 @@ routes.post(
   "/add-product",
   [
     body("title", "Validation Error on Title").isString().isLength({ min: 3 }).trim(),
-    body("imageUrl", "Validation Error on ImageUrl").isURL(),
+    body("imageUrl", "Validation Error on ImageUrl"),
     body("price", "Validation Error on Price").isFloat(),
     body("description", "Validation Error on Description").isLength({ min: 10, max: 200 }).trim(),
   ],
@@ -38,7 +38,7 @@ routes.post(
   "/edit-product",
   [
     body("title", "Validation Error on Title").isString().isLength({ min: 3 }),
-    body("imageUrl", "Validation Error on ImageUrl").isURL(),
+    body("imageUrl", "Validation Error on ImageUrl"),
     body("price", "Validation Error on Price").isFloat(),
     body("description", "Validation Error on Description").isLength({ min: 10, max: 200 }).trim(),
   ],

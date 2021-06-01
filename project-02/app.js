@@ -7,6 +7,7 @@ const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session); // pass the argument to fucntion
 const csrf = require("csurf");
 const flash = require("connect-flash");
+const multer = require("multer");
 
 // custom (my own) libraries
 const adminRoutes = require("./routes/admin");
@@ -30,6 +31,8 @@ const store = new MongoDBStore({
 
 // initialize cross-site-register-forgery Protectoin String
 const csrfProtection = csrf();
+
+app.use(multer().single('image'))
 
 // flash register so we can use it on evey request accross the all files
 app.use(flash()); // call it as a function
@@ -95,7 +98,7 @@ app.use("/admin", adminRoutes); // handling all admin routes
 app.use(shopRoutes); // handling all shop routes
 app.use(authRoutes); // handling all auth routes
 
-app.get('/500', errorController.get500);
+app.get("/500", errorController.get500);
 
 app.use(errorController.get404);
 
@@ -105,10 +108,10 @@ app.use(errorController.get404);
 // and reach this special middlewhere
 app.use((error, req, res, next) => {
   // res.status(error.httpStatusCode).render(...);
-  res.status(500).render('500', {
-    pageTitle: 'Error!',
-    path: '/500',
-    isAuthenticated: req.session.isLoggedIn
+  res.status(500).render("500", {
+    pageTitle: "Error!",
+    path: "/500",
+    isAuthenticated: req.session.isLoggedIn,
   });
 });
 

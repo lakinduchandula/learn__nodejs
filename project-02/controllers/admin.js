@@ -19,10 +19,11 @@ exports.getAddProduct = (req, res, next) => {
 exports.postAddProduct = (req, res, next) => {
   // extract the data from request.body
   const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
+  const imageUrl = req.file;
   const description = req.body.description;
   const price = req.body.price;
 
+  console.log(imageUrl);
   // pass all errors to req and check if there are any errors
   const errors = validationResult(req);
 
@@ -61,6 +62,7 @@ exports.postAddProduct = (req, res, next) => {
       const error = new Error(err);
       error.httpStatusCode = 500;
       return next(error);
+      // console.log(err);
     });
 };
 
