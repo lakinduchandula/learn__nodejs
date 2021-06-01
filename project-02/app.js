@@ -112,7 +112,6 @@ app.use((error, req, res, next) => {
   });
 });
 
-
 mongoose
   .connect(
     MONGODB_URI, // srv string to connect mongodb atlas
