@@ -62,6 +62,14 @@ app.use(
 
 app.use(csrfProtection); // add csrf(); to middleware chain
 
+// this is the ideal place to place the csrfprotection and isLoggedIn middelware
+// before the routes and after the user authentication
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken();
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  next();
+});
+
 app.use((req, res, next) => {
   // throw new Error("This will detect by express because this throw is out side of promise in then or catch block");
   if (!req.session.user) {
@@ -81,14 +89,6 @@ app.use((req, res, next) => {
       // throw new Error(err); This will *** NOT DETECT *** by express because this throw is IN side of catch block
       next(new Error(err)); // this will detect as a error and it will thow and handdle by middelware in line 106
     });
-});
-
-// this is the ideal place to place the csrfprotection and isLoggedIn middelware
-// before the routes and after the user authentication
-app.use((req, res, next) => {
-  res.locals.csrfToken = req.csrfToken();
-  res.locals.isAuthenticated = req.session.isLoggedIn;
-  next();
 });
 
 app.use("/admin", adminRoutes); // handling all admin routes
