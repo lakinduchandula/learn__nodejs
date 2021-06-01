@@ -71,7 +71,7 @@ exports.postLogin = (req, res, next) => {
           path: "/login",
           pageTitle: "Login",
           isAuthenticated: false,
-          errorMessage: ['No user found for that email !'],
+          errorMessage: ["No user found for that email !"],
           oldInput: {
             email: email,
             password: password,
@@ -96,16 +96,22 @@ exports.postLogin = (req, res, next) => {
             path: "/login",
             pageTitle: "Login",
             isAuthenticated: false,
-            errorMessage: ['Invalid Password please try again !'],
+            errorMessage: ["Invalid Password please try again !"],
             oldInput: {
               email: email,
               password: password,
             },
           });
+        })
+        .catch(err => {
+          console.log(err);
+          res.redirect("/login");
         });
     })
     .catch(err => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -157,7 +163,9 @@ exports.postSignup = (req, res, next) => {
       });
     })
     .catch(err => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -219,7 +227,9 @@ exports.postReset = (req, res, next) => {
         }
       })
       .catch(err => {
-        console.log(err);
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
       });
   });
 };
@@ -239,7 +249,9 @@ exports.getNewPassword = (req, res, next) => {
       }
     })
     .catch(err => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -282,6 +294,8 @@ exports.postNewPassword = (req, res, next) => {
       });
     })
     .catch(err => {
-      console.error(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };

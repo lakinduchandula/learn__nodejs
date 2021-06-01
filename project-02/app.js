@@ -20,7 +20,7 @@ const MONGODB_URI =
   "mongodb+srv://online-shop-node-application:6C65rHM7bQbxsPPn@cluster0.fjhfb.mongodb.net/shop";
 
 // import controllers
-const pageNotFoundController = require("./controllers/404");
+const errorController = require("./controllers/error");
 
 const app = express(); // this express will handle almost very thing in behind the scenes
 const store = new MongoDBStore({
@@ -64,15 +64,20 @@ app.use(csrfProtection); // add csrf(); to middleware chain
 
 app.use((req, res, next) => {
   if (!req.session.user) {
+    // check the session for perticular user
     return next();
   }
   User.findById(req.session.user._id)
     .then(user => {
+      // if user was deleted in between session and store user to req this if will save from such senario
+      if (!user) {
+        return next();
+      }
       req.user = user; // add the user to request so we can access it any where
       next();
     })
     .catch(err => {
-      console.log(err);
+      throw new Error(err);
     });
 });
 
@@ -88,7 +93,19 @@ app.use("/admin", adminRoutes); // handling all admin routes
 app.use(shopRoutes); // handling all shop routes
 app.use(authRoutes); // handling all auth routes
 
-app.use(pageNotFoundController.NotFoundPage);
+app.get('/500', errorController.get500);
+
+app.use(errorController.get404);
+
+// this is a special kind of middelware this has 4 arguments
+// this will only run when we next(error) <= if this call in
+// somewhere it means that route will skip all the middlewhere
+// and reach this special middlewhere
+app.use((error, req, res, next) => {
+  // res.status(error.httpStatusCode).render(...);
+  res.redirect('/500');
+});
+
 
 mongoose
   .connect(
