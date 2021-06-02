@@ -8,8 +8,8 @@ const MongoDBStore = require("connect-mongodb-session")(session); // pass the ar
 const csrf = require("csurf");
 const flash = require("connect-flash");
 const multer = require("multer");
-const { nanoid } = require('nanoid')
-
+const { nanoid } = require("nanoid");
+const { v4: uuidv4 } = require('uuid');
 
 // custom (my own) libraries
 const adminRoutes = require("./routes/admin");
@@ -31,14 +31,16 @@ const store = new MongoDBStore({
   collection: "sessions", // which collection to store sessions
 });
 
-let nanoidString = nanoid(10);
+// let uuid = uuidv4();
+// console.log('uuid ==> ',uuid);
+// console.log('nanoid ==> ',nanoid(10));
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "images");
   },
   filename: (req, file, cb) => {
-    cb(null, nanoidString + '-' + file.originalname);
+    cb(null, nanoid(10) + "-" + file.originalname);
   },
 });
 
@@ -66,7 +68,7 @@ app.use(flash()); // call it as a function
 
 // this middleware function will give the access to the user to read our file system in public folder
 app.use(express.static(path.join(__dirname, "public")));
-app.use('/images', express.static(path.join(__dirname, "images")));
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.set("view engine", "ejs"); // this will setup ejs as the template engine
 
