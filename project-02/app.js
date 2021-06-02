@@ -66,6 +66,7 @@ app.use(flash()); // call it as a function
 
 // this middleware function will give the access to the user to read our file system in public folder
 app.use(express.static(path.join(__dirname, "public")));
+app.use('/images', express.static(path.join(__dirname, "images")));
 
 app.set("view engine", "ejs"); // this will setup ejs as the template engine
 
