@@ -162,7 +162,7 @@ exports.postEditProduct = (req, res, next) => {
         /* in here i don't call to err callback in deleteFile method,
          because I'm on fire and manner It means that I don't need to wait until file delete,
           I need to move forward */
-        fielHelper.deleteFile(image.path);
+        fielHelper.deleteFile(product.imageUrl);
         product.imageUrl = image.path;
       }
       return product.save().then(result => {
