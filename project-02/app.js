@@ -8,6 +8,8 @@ const MongoDBStore = require("connect-mongodb-session")(session); // pass the ar
 const csrf = require("csurf");
 const flash = require("connect-flash");
 const multer = require("multer");
+const { nanoid } = require('nanoid')
+
 
 // custom (my own) libraries
 const adminRoutes = require("./routes/admin");
@@ -29,20 +31,22 @@ const store = new MongoDBStore({
   collection: "sessions", // which collection to store sessions
 });
 
+let nanoidString = nanoid(10);
+
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'images');
+    cb(null, "images");
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  }
+    cb(null, nanoidString + '-' + file.originalname);
+  },
 });
 
 const fileFilter = (req, file, cb) => {
   if (
-    file.mimetype === 'image/png' ||
-    file.mimetype === 'image/jpg' ||
-    file.mimetype === 'image/jpeg'
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
   ) {
     cb(null, true);
   } else {
@@ -53,7 +57,9 @@ const fileFilter = (req, file, cb) => {
 // initialize cross-site-register-forgery Protectoin String
 const csrfProtection = csrf();
 // dest: './images'
-app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single("image"));
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
 
 // flash register so we can use it on evey request accross the all files
 app.use(flash()); // call it as a function

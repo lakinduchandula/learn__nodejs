@@ -25,7 +25,9 @@
     "mongodb": "^3.6.8",
     "mongoose": "^5.12.10",
     "multer": "^1.4.2",
+    "nanoid": "^3.1.23",
     "nodemailer": "^6.6.1",
-    "npm": "^7.13.0"
+    "npm": "^7.13.0",
+    "unique-string": "^3.0.0"
   }
 }

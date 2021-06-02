@@ -1,7 +1,6 @@
 //3rd party libraries
 const Product = require("../models/product");
 
-
 const { validationResult } = require("express-validator");
 
 // export this get method add product middleware func
