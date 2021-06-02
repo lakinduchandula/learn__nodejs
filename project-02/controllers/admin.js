@@ -1,5 +1,6 @@
-//3rd party libraries
+// custom lib
 const Product = require("../models/product");
+const fielHelper = require("../utils/files");
 
 const { validationResult } = require("express-validator");
 
@@ -25,7 +26,7 @@ exports.postAddProduct = (req, res, next) => {
 
   // check if the file is an image or other format if other format image will be undefined
   if (!image) {
-    console.log("I came!")
+    console.log("I came!");
     return res.status(422).render("admin/edit-product", {
       pageTitle: "Add Product",
       path: "/admin/edit-product",
@@ -36,7 +37,7 @@ exports.postAddProduct = (req, res, next) => {
         description: description,
         price: price,
       },
-      errorMessage: ['Not an Image file!'],
+      errorMessage: ["Not an Image file!"],
     });
   }
 
@@ -79,10 +80,10 @@ exports.postAddProduct = (req, res, next) => {
       res.redirect("/admin/products");
     })
     .catch(err => {
-      // const error = new Error(err);
-      // error.httpStatusCode = 500;
-      // return next(error);
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+      // console.log(err);
     });
 };
 
@@ -111,10 +112,10 @@ exports.getEditProduct = (req, res, next) => {
       });
     })
     .catch(err => {
-      // const error = new Error(err);
-      // error.httpStatusCode = 500;
-      // return next(error);
-      console.log(error);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+      // console.log(error);
     });
 };
 
@@ -157,7 +158,11 @@ exports.postEditProduct = (req, res, next) => {
       product.description = updatedDescription;
 
       // check if there is image exsist
-      if(image) {
+      if (image) {
+        /* in here i don't call to err callback in deleteFile method,
+         because I'm on fire and manner It means that I don't need to wait until file delete,
+          I need to move forward */
+        fielHelper.deleteFile(image.path);
         product.imageUrl = image.path;
       }
       return product.save().then(result => {
@@ -166,25 +171,32 @@ exports.postEditProduct = (req, res, next) => {
       });
     })
     .catch(err => {
-      // const error = new Error(err);
-      // error.httpStatusCode = 500;
-      // return next(error);
-      console.log(error);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+      // console.log(error);
     });
 };
 
 exports.postDeleteProduct = (req, res, next) => {
   const productId = req.body.productId;
-  Product.deleteOne({ _id: productId, userId: req.user._id }) // findByIdAndRemoved is mongoose method
+  Product.findById(productId)
+    .then(product => {
+      if (!product) {
+        return next(new Error("Product Not Found!"));
+      }
+      fielHelper.deleteFile(product.imageUrl);
+      return Product.deleteOne({ _id: productId, userId: req.user._id });
+    })
     .then(result => {
       console.log("Product Deleted!");
       res.redirect("/admin/products");
     })
     .catch(err => {
-      // const error = new Error(err);
-      // error.httpStatusCode = 500;
-      // return next(error);
-      console.log(error);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+      // console.log(error);
     });
 };
 
@@ -206,9 +218,9 @@ exports.getProducts = (req, res, next) => {
       });
     })
     .catch(err => {
-      // const error = new Error(err);
-      // error.httpStatusCode = 500;
-      // return next(error);
-      console.log(error);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+      // console.log(error);
     });
 };
