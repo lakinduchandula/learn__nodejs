@@ -1,11 +1,15 @@
 const fs = require("fs");
 const path = require("path");
 
-// 3rd party package
+//** 3rd party package
 const PDFDocuments = require("pdfkit");
 
+//** import from models
 const Product = require("../models/product");
 const Order = require("../models/order");
+
+//*** constants
+const ITEMS_PER_PAGE = 4;
 
 // export this get methods shop product middleware func
 exports.getProducts = (req, res, next) => {
@@ -32,7 +36,11 @@ exports.getProducts = (req, res, next) => {
 
 // Index Page Controller
 exports.getIndex = (req, res, next) => {
+  const page = req.query.page;
+
   Product.find()
+    .skip((page - 1) * ITEMS_PER_PAGE)
+    .limit(ITEMS_PER_PAGE)
     .then(products => {
       res.render("shop/index", {
         prods: products,
