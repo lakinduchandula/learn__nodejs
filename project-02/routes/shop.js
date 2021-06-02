@@ -13,7 +13,7 @@ const router = express.Router();
  * define (i.e. shopController.SOME_MIDDLEWARE), if we forget to mention next()      *
  * in some middleware (example in isAuthenticated) it means if route didn't match    *
  * it will die in that perticular middelware it means no pass to other middleware.   *
-**************************************************************************************/
+ **************************************************************************************/
 
 // this will handle all added products
 router.get("/", shopController.getIndex);
@@ -24,7 +24,7 @@ router.get("/cart", isAuthenticated, shopController.getCart);
 
 router.post("/cart", isAuthenticated, shopController.postCart);
 
-/******************************** THEORY ********************************************* 
+/******************************** THEORY *********************************************
  * ":" indicates a variable(dynamic) path like when we type product/:productId,      *
  *  it means any thing after product/1234                                            *
  * it will not look at static(fix) path like normal route                            *
@@ -32,16 +32,21 @@ router.post("/cart", isAuthenticated, shopController.postCart);
  * If you have specific route and dynamic route together, remember that node         *
  *  will treat routes as top to bottom so make sure to keep specified route at top,  *
  *  otherwise it is unable to reach it....  router.get('/products/delete');          *
-**************************************************************************************/
-router.get('/products/:productId', shopController.getProduct);
+ **************************************************************************************/
+router.get("/products/:productId", shopController.getProduct);
 
 router.get("/orders", isAuthenticated, shopController.getOrders);
 
-router.post('/create-order', isAuthenticated, shopController.postOrders);
+router.get("/orders/:orderId", isAuthenticated, shopController.getInvoice);
+
+router.post("/create-order", isAuthenticated, shopController.postOrders);
 
 router.get("/checkout", isAuthenticated, shopController.getCheckout);
 
-router.post("/cart-delete-item", isAuthenticated, shopController.postCartDelete)
-
+router.post(
+  "/cart-delete-item",
+  isAuthenticated,
+  shopController.postCartDelete
+);
 
 module.exports = router;

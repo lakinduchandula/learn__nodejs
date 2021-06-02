@@ -1,3 +1,6 @@
+const fs = require("fs");
+const path = require("path");
+
 const Product = require("../models/product");
 const Order = require("../models/order");
 
@@ -179,5 +182,32 @@ exports.getCheckout = (req, res, next) => {
     path: "/checkout",
     pageTitle: "Checkout",
     // isAuthenticated: req.session.isLoggedIn,
+  });
+};
+
+exports.getInvoice = (req, res, next) => {
+  const orderId = req.params.orderId;
+  const invoiceName = "invoice-" + orderId + ".pdf";
+  const invoicePath = path.join("data", "invoices", invoiceName);
+
+  // check this user belongs to this invoice
+  Order.findById(orderId).then(order => {
+    if (!order) {
+      return next(new Error("No such Order in Database!"));
+    }
+    if (order.user.userId.toString() !== req.user._id.toString()) {
+      return next(new Err("User doesn't belongs to this invoice!"));
+    }
+    fs.readFile(invoicePath, (err, data) => {
+      if (err) {
+        return next(err);
+      }
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        'inline; filename=" ' + invoiceName + ' " '
+      );
+      res.send(data);
+    });
   });
 };
