@@ -29,10 +29,31 @@ const store = new MongoDBStore({
   collection: "sessions", // which collection to store sessions
 });
 
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'images');
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/jpeg'
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 // initialize cross-site-register-forgery Protectoin String
 const csrfProtection = csrf();
-
-app.use(multer().single('image'))
+// dest: './images'
+app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single("image"));
 
 // flash register so we can use it on evey request accross the all files
 app.use(flash()); // call it as a function
@@ -111,7 +132,7 @@ app.use((error, req, res, next) => {
   res.status(500).render("500", {
     pageTitle: "Error!",
     path: "/500",
-    isAuthenticated: req.session.isLoggedIn,
+    isAuthenticated: true,
   });
 });
 
