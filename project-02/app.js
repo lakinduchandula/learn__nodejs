@@ -134,14 +134,14 @@ app.use(errorController.get404);
 // this will only run when we next(error) <= if this call in
 // somewhere it means that route will skip all the middlewhere
 // and reach this special middlewhere
-// app.use((error, req, res, next) => {
-//   // res.status(error.httpStatusCode).render(...);
-//   res.status(500).render("500", {
-//     pageTitle: "Error!",
-//     path: "/500",
-//     isAuthenticated: true,
-//   });
-// });
+app.use((error, req, res, next) => {
+  // res.status(error.httpStatusCode).render(...);
+  res.status(500).render("500", {
+    pageTitle: "Error!",
+    path: "/500",
+    isAuthenticated: true,
+  });
+});
 
 mongoose
   .connect(

@@ -28,6 +28,7 @@
     "nanoid": "^3.1.23",
     "nodemailer": "^6.6.1",
     "npm": "^7.13.0",
+    "pdfkit": "^0.12.1",
     "unique-string": "^3.0.0"
   }
 }

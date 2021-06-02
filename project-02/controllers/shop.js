@@ -1,6 +1,9 @@
 const fs = require("fs");
 const path = require("path");
 
+// 3rd party package
+const PDFDocuments = require("pdfkit");
+
 const Product = require("../models/product");
 const Order = require("../models/order");
 
@@ -196,9 +199,11 @@ exports.getInvoice = (req, res, next) => {
       return next(new Error("No such Order in Database!"));
     }
     if (order.user.userId.toString() !== req.user._id.toString()) {
-      return next(new Err("User doesn't belongs to this invoice!"));
+      return next(new Error("User doesn't belongs to this invoice!"));
     }
-    fs.readFile(invoicePath, (err, data) => {
+    /****************** NOT GOOD FOR LARGE FILES EAT THE MEMORY FOR MORE REQ ************************/
+    /************************************************************************************************
+     * fs.readFile(invoicePath, (err, data) => {
       if (err) {
         return next(err);
       }
@@ -208,6 +213,56 @@ exports.getInvoice = (req, res, next) => {
         'inline; filename=" ' + invoiceName + ' " '
       );
       res.send(data);
+       });
+    *************************************************************************************************/
+    const OrderPDF = new PDFDocuments();
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      'inline; filename=" ' + invoiceName + ' " '
+    );
+    OrderPDF.pipe(fs.createWriteStream(invoicePath));
+    OrderPDF.pipe(res);
+
+    OrderPDF.fontSize(16).text(
+      "-----------------------------------  INVOICE  -----------------------------------"
+    );
+
+    let totalPrice = 0;
+    order.products.forEach(prod => {
+      totalPrice += prod.quantity * prod.product.price;
+      OrderPDF.fontSize(12).text(
+        prod.product.title +
+          "                                             " +
+          prod.quantity +
+          " x " +
+          "$" +
+          prod.product.price
+      );
     });
+
+    OrderPDF.text("  ");
+    OrderPDF.text("  ");
+    OrderPDF.text("  ");
+    OrderPDF.text(
+      "------------------------------------------------------------------------------------------------------------------"
+    );
+    OrderPDF.fontSize(14).text("Total Price: $" + totalPrice);
+    OrderPDF.text("  ");
+    OrderPDF.fontSize(16).text(
+      "------------------------------- END OF INVOICE -----------------------------"
+    );
+
+    OrderPDF.end(); // done writeing file will save
+
+    /**************************************************************************************************
+     * const file = fs.createReadStream(invoicePath);
+       res.setHeader("Content-Type", "application/pdf");
+       res.setHeader(
+        "Content-Disposition",
+        'inline; filename=" ' + invoiceName + ' " '
+      );
+      file.pipe(res);
+    ***************************************************************************************************/
   });
 };
