@@ -4,6 +4,9 @@ const fielHelper = require("../utils/files");
 
 const { validationResult } = require("express-validator");
 
+//*** constants
+const ITEMS_PER_PAGE = 5;
+
 // export this get method add product middleware func
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/edit-product", {
@@ -178,8 +181,8 @@ exports.postEditProduct = (req, res, next) => {
     });
 };
 
-exports.postDeleteProduct = (req, res, next) => {
-  const productId = req.body.productId;
+exports.deleteProduct = (req, res, next) => {
+  const productId = req.params.productId;
   Product.findById(productId)
     .then(product => {
       if (!product) {
@@ -190,18 +193,30 @@ exports.postDeleteProduct = (req, res, next) => {
     })
     .then(result => {
       console.log("Product Deleted!");
-      res.redirect("/admin/products");
+      // res.redirect("/admin/products");
+      res.status(200).json({ message: "Product Deleted!" });
     })
     .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
+      // const error = new Error(err);
+      // error.httpStatusCode = 500;
+      // return next(error);
       // console.log(error);
+      res.status(500).json({ message: "Product Deletion Failed!!" });
     });
 };
 
 exports.getProducts = (req, res, next) => {
+  const page = +req.query.page || 1;
+  let totalItems = 0;
+
   Product.find({ userId: req.user._id })
+    .countDocuments()
+    .then(numberProducts => {
+      totalItems = numberProducts;
+      return Product.find({ userId: req.user._id })
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
     /*************************************** SIDE NOTE ********************************************
      * through -> .select() this will allow us to which filed that we need to select or unselect  *
      * through -> populate() this will allow us to fetch specified data                           *
@@ -215,6 +230,13 @@ exports.getProducts = (req, res, next) => {
         pageTitle: "Admin Products",
         path: "/admin/products",
         // isAuthenticated: req.session.isLoggedIn,
+        currentPage: page,
+        totalProducts: totalItems,
+        hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+        hasPreviousPage: page > 1,
+        nextPage: page + 1,
+        previousPage: page - 1,
+        lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
       });
     })
     .catch(err => {

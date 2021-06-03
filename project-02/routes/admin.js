@@ -46,10 +46,10 @@ routes.post(
   adminController.postEditProduct
 );
 
-routes.post(
-  "/delete-product",
+routes.delete(
+  "/products/:productId",
   isAuthenticated,
-  adminController.postDeleteProduct
+  adminController.deleteProduct
 );
 
 module.exports = routes;
