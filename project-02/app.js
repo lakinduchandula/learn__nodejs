@@ -138,6 +138,7 @@ app.use(errorController.get404);
 // and reach this special middlewhere
 app.use((error, req, res, next) => {
   // res.status(error.httpStatusCode).render(...);
+  console.log(error);
   res.status(500).render("500", {
     pageTitle: "Error!",
     path: "/500",

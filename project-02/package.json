@@ -29,6 +29,7 @@
     "nodemailer": "^6.6.1",
     "npm": "^7.13.0",
     "pdfkit": "^0.12.1",
+    "stripe": "^8.151.0",
     "unique-string": "^3.0.0",
     "uuid": "^8.3.2"
   }

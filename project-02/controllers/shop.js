@@ -3,6 +3,9 @@ const path = require("path");
 
 //** 3rd party package
 const PDFDocuments = require("pdfkit");
+const stripe = require("stripe")(
+  "sk_test_51IyWS2DKWbb0YVu6KiDZIy9XoGwJ7PcUpxM7XDMjtwiCvYYipoLVt6fF3ivwKuU4k0EPuwh766XqFCSvrI8SXabs00i8BEJ41R"
+);
 
 //** import from models
 const Product = require("../models/product");
@@ -197,6 +200,38 @@ exports.getOrders = (req, res, next) => {
 };
 
 // post orders
+exports.getCheckoutSuccess = (req, res, next) => {
+  req.user
+    .populate("cart.items.product") // this will specifically return the prod doc
+    .execPopulate() // populate not return promise by default therefore -> execPopulate
+    .then(user => {
+      const products = user.cart.items.map(i => {
+        return { quantity: i.quantity, product: { ...i.product._doc } };
+      });
+      const order = new Order({
+        products: products,
+        user: {
+          userId: req.user,
+          name: req.user.name,
+        },
+      });
+      order.save();
+    })
+    .then(() => {
+      return req.user.clearCart();
+    })
+    .then(() => {
+      res.redirect("/orders");
+    })
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+      // console.log(error);
+    });
+};
+
+// post orders
 exports.postOrders = (req, res, next) => {
   req.user
     .populate("cart.items.product") // this will specifically return the prod doc
@@ -230,20 +265,40 @@ exports.postOrders = (req, res, next) => {
 
 // Checkout Page Controller
 exports.getCheckout = (req, res, next) => {
+  let products;
+  let total;
   req.user
     .populate("cart.items.product")
     .execPopulate()
     .then(user => {
-      const products = user.cart.items;
-      let total = 0;
+      products = user.cart.items;
+      total = 0;
       products.forEach(p => {
         total += p.quantity * p.product.price;
       });
+
+      return stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: products.map(prod => {
+          return {
+            name: prod.product.title,
+            description: prod.product.description,
+            amount: prod.product.price * 100,
+            currency: "usd",
+            quantity: prod.quantity,
+          };
+        }),
+        success_url: req.protocol + "://" + req.get("host") + '/checkout/success',
+        cancel_url: req.protocol + "://" + req.get("host") + '/checkout/cancel',
+      });
+    })
+    .then(session => {
       res.render("shop/checkout", {
         path: "/checkout",
         pageTitle: "Checkout",
         products: products,
         totalSum: total,
+        sessionId: session.id,
       });
     })
     .catch(err => {

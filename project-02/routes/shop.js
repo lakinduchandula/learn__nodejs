@@ -39,9 +39,13 @@ router.get("/orders", isAuthenticated, shopController.getOrders);
 
 router.get("/orders/:orderId", isAuthenticated, shopController.getInvoice);
 
-router.post("/create-order", isAuthenticated, shopController.postOrders);
+// router.post("/create-order", isAuthenticated, shopController.postOrders);
 
 router.get("/checkout", isAuthenticated, shopController.getCheckout);
+
+router.get("/checkout/success", isAuthenticated, shopController.getCheckoutSuccess);
+
+router.get("/checkout/cancel", isAuthenticated, shopController.getCheckout);
 
 router.post(
   "/cart-delete-item",
