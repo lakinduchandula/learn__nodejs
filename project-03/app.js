@@ -9,7 +9,8 @@ app.use(express.json()); // application/json
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*"); // this allow to setHeaders from every domain
-  res.setHeader(    // this is about what methods that can used by the clients
+  res.setHeader(
+    // this is about what methods that can used by the clients
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, PATCH" // examples which methods can use to connect with end points
   );
@@ -19,4 +20,6 @@ app.use((req, res, next) => {
 
 app.use("/feed", feedRouter);
 
-app.listen(8080);
+app.listen(8080, cb => {
+  console.log("Server Active!");
+});
