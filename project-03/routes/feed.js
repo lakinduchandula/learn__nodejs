@@ -7,4 +7,6 @@ const feedController = require("../controllers/feed");
 // GET => /feed/posts
 router.get("/posts", feedController.getPosts);
 
+router.post("/posts", feedController.createPost);
+
 module.exports = router;
