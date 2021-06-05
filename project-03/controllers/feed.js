@@ -31,11 +31,19 @@ exports.createPost = (req, res, next) => {
     throw error;
   }
 
+  if (!req.file) {
+    const error = new Error("File is not found!");
+    error.statusCode = 422;
+    throw error;
+  }
+
+  const imageUrl = req.file.path.replace("\\","/");;
+
   // create post in database
   const post = new Post({
     title: title,
     content: content,
-    imageUrl: "images/sample.png",
+    imageUrl: imageUrl,
     creator: {
       name: "test@lakinduchandula.com",
     },
