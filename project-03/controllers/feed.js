@@ -1,3 +1,5 @@
+const { validationResult } = require("express-validator");
+
 exports.getPosts = (req, res, next) => {
   res.status(200).json({
     posts: [
@@ -18,9 +20,16 @@ exports.getPosts = (req, res, next) => {
 exports.createPost = (req, res, next) => {
   const title = req.body.title;
   const content = req.body.content;
+  const errors = validationResult(req); // this will catch all the errors caught by routering file
+
+  if (!errors.isEmpty()) {
+    return res
+      .status(422)
+      .json({ message: "Validation Failed!", errors: errors.array() });
+  }
 
   // create post in database
-  console.log('API Called!')
+  console.log("API Called!");
 
   res.status(201).json({
     message: "Created post successfully!",
