@@ -1,5 +1,5 @@
 const express = require("express");
-const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 const app = express();
 
@@ -20,6 +20,15 @@ app.use((req, res, next) => {
 
 app.use("/feed", feedRouter);
 
-app.listen(8080, cb => {
-  console.log("Server Active!");
-});
+mongoose
+  .connect(
+    "mongodb+srv://online-shop-node-application:6C65rHM7bQbxsPPn@cluster0.fjhfb.mongodb.net/chat",
+    { useNewUrlParser: true, useUnifiedTopology: true }
+  )
+  .then(result => {
+    console.log("Connected to Monogodb Atlas!");
+    app.listen(8080);
+  })
+  .catch(err => {
+    console.log(err);
+  });
