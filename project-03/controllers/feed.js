@@ -4,20 +4,20 @@ const { validationResult } = require("express-validator");
 const Post = require("../models/feed");
 
 exports.getPosts = (req, res, next) => {
-  res.status(200).json({
-    posts: [
-      {
-        _id: "25864",
-        title: "First Post",
-        content: "This is the first post",
-        imageUrl: "images/sample.png",
-        creator: {
-          name: "lakinduchandula",
-        },
-        createdAt: Date.now(),
-      },
-    ],
-  });
+  Post.find()
+    .then(posts => {
+      res.status(200).json({
+        message: "Find post successfully!",
+        posts: posts,
+      });
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      // throw err; <= this code must fail because it is inside of asynchronous function
+      next(err); // this will work with the err
+    });
 };
 
 exports.createPost = (req, res, next) => {
@@ -26,7 +26,7 @@ exports.createPost = (req, res, next) => {
   const errors = validationResult(req); // this will catch all the errors caught by routering file
 
   if (!errors.isEmpty()) {
-    const error = new Error('Validation Failed! at createPost');
+    const error = new Error("Validation Failed! at createPost");
     error.statusCode = 422;
     throw error;
   }
@@ -35,7 +35,7 @@ exports.createPost = (req, res, next) => {
   const post = new Post({
     title: title,
     content: content,
-    imageUrl: "images/sample.jpg",
+    imageUrl: "images/sample.png",
     creator: {
       name: "test@lakinduchandula.com",
     },
@@ -51,10 +51,30 @@ exports.createPost = (req, res, next) => {
       });
     })
     .catch(err => {
-      if(!err.statusCode){
+      if (!err.statusCode) {
         err.statusCode = 500;
       }
       // throw err; <= this code must fail because it is inside of asynchronous function
+      next(err); // this will work with the err
+    });
+};
+
+exports.getPost = (req, res, next) => {
+  const postId = req.params.postId;
+  Post.findById(postId)
+    .then(post => {
+      if (!post) {
+        const error = new Error("Not Found Post for that postId!");
+        error.statusCode = 404;
+        throw err; // this will work because after this have a catch block insted of then block
+      }
+
+      res.status(200).json({ message: "Post Found!", post: post });
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
       next(err); // this will work with the err
     });
 };
