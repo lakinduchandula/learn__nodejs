@@ -20,9 +20,18 @@ exports.createPost = (req, res, next) => {
   const content = req.body.content;
 
   // create post in database
+  console.log('API Called!')
 
   res.status(201).json({
     message: "Created post successfully!",
-    post: { id: new Date().toISOString(), title: title, content: content },
+    post: {
+      id: new Date().toISOString(),
+      title: title,
+      content: content,
+      creator: {
+        name: "test@lakinduchandula.com",
+      },
+      createdAt: Date.now(),
+    },
   });
 };
