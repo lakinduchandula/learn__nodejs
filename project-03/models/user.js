@@ -12,8 +12,10 @@ const userSchema = new Schema(
       required: true,
     },
     name: { type: String, required: true },
-    status: { type: String, required: true },
+    status: { type: String, default: "I'm new" },
     posts: [{ type: Schema.Types.ObjectId, ref: "Post" }],
   },
   { timestamps: true }
 );
+
+module.exports = mongoose.model("User", userSchema);

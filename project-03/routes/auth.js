@@ -19,7 +19,7 @@ router.put(
       .custom((value, { req }) => {
         return User.findOne({ email: value }).then(userDoc => {
           if (userDoc) {
-            return Promise.reject("Email is already taken!");
+            return Promise.reject("E-Mail address already exists!");
           }
         });
       }),
