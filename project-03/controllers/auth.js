@@ -10,7 +10,7 @@ exports.signup = (req, res, next) => {
     const error = new Error("Validation Faild!");
     error.statusCode = 422;
     error.data = errors.array();
-    console.log("Error Email ==>  ",errors.array());
+    console.log("Error Email ==>  ", errors.array());
     throw error;
   }
   const email = req.body.email;
@@ -34,5 +34,35 @@ exports.signup = (req, res, next) => {
         error.statusCode = 500;
       }
       next(error); // this will work with the err
+    });
+};
+
+exports.login = (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  let loadUser;
+
+  User.findOne({ email: email })
+    .then(user => {
+      if (!user) {
+        const error = new Error("User not found!");
+        error.statusCode = 401;
+        throw error;
+      }
+      loadUser = user;
+      return bcrypt.compare(password, user.password);
+    })
+    .then(isMatch => {
+      if (!isMatch) {
+        const error = new Error("Password is mismatch!");
+        error.statusCode = 401;
+        throw error;
+      }
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err); // this will work with the err;
     });
 };
