@@ -5,6 +5,7 @@ const { validationResult } = require("express-validator");
 
 // import models
 const Post = require("../models/feed");
+const { findByIdAndRemove } = require("../models/feed");
 
 exports.getPosts = (req, res, next) => {
   Post.find()
@@ -55,7 +56,6 @@ exports.createPost = (req, res, next) => {
   post
     .save()
     .then(result => {
-      console.log("New Feed Created!", result);
       res.status(201).json({
         message: "Created post successfully!",
         post: result,
@@ -143,4 +143,28 @@ const clearImage = filePath => {
       console.log("Error => ", err);
     }
   });
+};
+
+exports.deletePost = (req, res, next) => {
+  const postId = req.params.postId;
+  Post.findById(postId)
+    .then(post => {
+      if (!post) {
+        const error = new Error("Post is not found in database");
+        error.statusCode = 422;
+        next(error);
+      }
+      clearImage(post.imageUrl);
+      return Post.findByIdAndRemove(postId);
+    })
+    .then(result => {
+      console.log(result);
+      res.status(200).json({ message: "Post deleted successfully!" });
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err); // this will work with the err
+    });
 };
