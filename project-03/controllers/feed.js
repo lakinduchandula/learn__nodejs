@@ -1,3 +1,6 @@
+const fs = require("fs");
+const path = require("path");
+
 const { validationResult } = require("express-validator");
 
 // import models
@@ -37,7 +40,7 @@ exports.createPost = (req, res, next) => {
     throw error;
   }
 
-  const imageUrl = req.file.path.replace("\\","/");;
+  const imageUrl = req.file.path.replace("\\", "/");
 
   // create post in database
   const post = new Post({
@@ -85,4 +88,59 @@ exports.getPost = (req, res, next) => {
       }
       next(err); // this will work with the err
     });
+};
+
+exports.updatePost = (req, res, next) => {
+  const postId = req.params.postId;
+  const title = req.body.title;
+  const content = req.body.content;
+
+  let imageUrl = req.body.image;
+
+  if (req.file) {
+    // check update the file or not
+    imageUrl = req.file.path.replace("\\", "/");
+  }
+
+  if (!imageUrl) {
+    // this is little bit optional
+    const error = new Error("No file found!");
+    error.statusCode = 422;
+    throw error;
+  }
+  Post.findById(postId)
+    .then(post => {
+      if (!post) {
+        const error = new Error("Not Found Post for that postId!");
+        error.statusCode = 404;
+        next(err);
+      }
+      if (imageUrl !== post.imageUrl) {
+        clearImage(post.imageUrl);
+      }
+      post.title = title;
+      post.content = content;
+      post.imageUrl = imageUrl;
+      return post.save();
+    })
+    .then(result => {
+      res
+        .status(200)
+        .json({ message: "Post Updated Successfully!", post: result });
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err); // this will work with the err
+    });
+};
+
+const clearImage = filePath => {
+  filePath = path.join(__dirname, "..", filePath);
+  fs.unlink(filePath, err => {
+    if (err) {
+      console.log("Error => ", err);
+    }
+  });
 };
