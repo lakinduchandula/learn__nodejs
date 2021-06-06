@@ -1,12 +1,15 @@
 const express = require("express");
 const { body } = require("express-validator");
 
+//* import middlewhere
+const isAuth = require("../middleware/auth");
+
 const router = express.Router();
 
 const feedController = require("../controllers/feed");
 
 // GET => /feed/posts
-router.get("/posts", feedController.getPosts);
+router.get("/posts", isAuth, feedController.getPosts);
 
 router.post(
   "/posts",
