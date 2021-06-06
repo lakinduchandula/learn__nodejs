@@ -58,7 +58,7 @@ exports.createPost = (req, res, next) => {
   }
 
   const imageUrl = req.file.path.replace("\\", "/");
-  console.log('req.user id ============================ ',req.userId)
+  console.log("req.user id ============================ ", req.userId);
 
   // create post in database
   const post = new Post({
@@ -139,6 +139,11 @@ exports.updatePost = (req, res, next) => {
         error.statusCode = 404;
         next(err);
       }
+      if (post.creator.toString() !== req.userId.toString()) {
+        const error = new Error("User is not allow to update is post!");
+        error.statusCode = 403;
+        throw error;
+      }
       if (imageUrl !== post.imageUrl) {
         clearImage(post.imageUrl);
       }
@@ -178,8 +183,20 @@ exports.deletePost = (req, res, next) => {
         error.statusCode = 422;
         next(error);
       }
+      if (post.creator.toString() !== req.userId.toString()) {
+        const error = new Error("User is not allow to update is post!");
+        error.statusCode = 403;
+        throw error;
+      }
       clearImage(post.imageUrl);
       return Post.findByIdAndRemove(postId);
+    })
+    .then(result => {
+      return User.findById(req.userId);
+    })
+    .then(user => {
+      user.posts.pull(postId);
+      return user.save();
     })
     .then(result => {
       // console.log(result);
