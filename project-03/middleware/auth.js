@@ -27,7 +27,7 @@ module.exports = (req, res, next) => {
     error.statusCode = 401;
     throw error;
   }
-
+  
   req.userId = decodedToken.userId; // store the userId for feature use accross the application it can be extract from request
   next();
 };

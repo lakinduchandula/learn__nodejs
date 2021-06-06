@@ -4,8 +4,10 @@ const path = require("path");
 const { validationResult } = require("express-validator");
 
 // import models
-const Post = require("../models/feed");
-const { findByIdAndRemove } = require("../models/feed");
+const Post = require("../models/post");
+const User = require("../models/user");
+
+const { findByIdAndRemove } = require("../models/post");
 
 exports.getPosts = (req, res, next) => {
   const currentPage = req.query.page || 1;
@@ -40,6 +42,8 @@ exports.createPost = (req, res, next) => {
   const title = req.body.title;
   const content = req.body.content;
   const errors = validationResult(req); // this will catch all the errors caught by routering file
+  console.log("=================== Come to create Post =====================");
+  let creator;
 
   if (!errors.isEmpty()) {
     const error = new Error("Validation Failed! at createPost");
@@ -54,23 +58,31 @@ exports.createPost = (req, res, next) => {
   }
 
   const imageUrl = req.file.path.replace("\\", "/");
+  console.log('req.user id ============================ ',req.userId)
 
   // create post in database
   const post = new Post({
     title: title,
     content: content,
     imageUrl: imageUrl,
-    creator: {
-      name: "test@lakinduchandula.com",
-    },
+    creator: req.userId,
   });
 
   post
     .save()
     .then(result => {
+      return User.findById(req.userId);
+    })
+    .then(user => {
+      user.posts.push(post);
+      creator = user;
+      return user.save();
+    })
+    .then(result => {
       res.status(201).json({
         message: "Created post successfully!",
-        post: result,
+        post: post,
+        creator: { _id: creator._id, name: creator.name },
       });
     })
     .catch(err => {
