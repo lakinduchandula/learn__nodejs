@@ -7,6 +7,7 @@ const { nanoid } = require("nanoid");
 const app = express();
 
 const feedRouter = require("./routes/feed");
+const authRouter = require("./routes/auth");
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -47,6 +48,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/feed", feedRouter);
+app.use("/auth", authRouter);
 
 app.use((error, req, res, next) => {
   console.log(error);
