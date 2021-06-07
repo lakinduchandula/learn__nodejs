@@ -17,6 +17,7 @@ exports.getPosts = (req, res, next) => {
   let totalItems;
   Post.find()
     .populate("creator")
+    .sort({ createdAt: -1 })
     .countDocuments()
     .then(count => {
       totalItems = count;
@@ -82,7 +83,10 @@ exports.createPost = (req, res, next) => {
     .then(result => {
       io.getIO().emit("posts", {
         action: "create",
-        post: { ...post._doc, creator: { _id: req.userId, name: creator.name } },
+        post: {
+          ...post._doc,
+          creator: { _id: req.userId, name: creator.name },
+        },
       });
       res.status(201).json({
         message: "Created post successfully!",
@@ -138,6 +142,7 @@ exports.updatePost = (req, res, next) => {
     throw error;
   }
   Post.findById(postId)
+    .populate("creator")
     .then(post => {
       if (!post) {
         const error = new Error("Not Found Post for that postId!");
@@ -145,7 +150,7 @@ exports.updatePost = (req, res, next) => {
         next(err);
       }
       // console.log('UserId =====> ',req.userId)
-      if (post.creator.toString() !== req.userId) {
+      if (post.creator._id.toString() !== req.userId) {
         const error = new Error("User is not allow to update is post!");
         error.statusCode = 403;
         throw error;
@@ -159,6 +164,7 @@ exports.updatePost = (req, res, next) => {
       return post.save();
     })
     .then(result => {
+      io.getIO().emit("posts", { action: "update", post: result });
       res
         .status(200)
         .json({ message: "Post Updated Successfully!", post: result });
@@ -206,6 +212,7 @@ exports.deletePost = (req, res, next) => {
     })
     .then(result => {
       // console.log(result);
+      io.getIO().emit("posts", { action: "delete", post: postId });
       res.status(200).json({ message: "Post deleted successfully!" });
     })
     .catch(err => {
