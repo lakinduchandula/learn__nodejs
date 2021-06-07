@@ -75,19 +75,11 @@ mongoose
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(result => {
-    console.log("Connected to Monogodb Atlas!");
+    console.log(" = Connected to Monogodb Atlas! =");
     const server = app.listen(8080);
-    const io = require("socket.io")(server, {
-      cors: {
-        origin: "http://localhost:3000",
-        methods: ["GET", "POST"],
-        transports: ["websocket", "polling"],
-        credentials: true,
-      },
-      allowEIO3: true,
-    });
+    const io = require('./socket').init(server);
     io.on("connection", socket => {
-      console.log("Clinet Connected!");
+      console.log("======= Clinet Connected! =======");
     });
   })
   .catch(err => {
