@@ -7,6 +7,8 @@ const { validationResult } = require("express-validator");
 const Post = require("../models/post");
 const User = require("../models/user");
 
+// import socket.js
+const io = require("../socket.js");
 
 exports.getPosts = (req, res, next) => {
   const currentPage = req.query.page || 1;
@@ -14,6 +16,7 @@ exports.getPosts = (req, res, next) => {
 
   let totalItems;
   Post.find()
+    .populate("creator")
     .countDocuments()
     .then(count => {
       totalItems = count;
@@ -57,7 +60,7 @@ exports.createPost = (req, res, next) => {
   }
 
   const imageUrl = req.file.path.replace("\\", "/");
- 
+
   // create post in database
   const post = new Post({
     title: title,
@@ -77,6 +80,10 @@ exports.createPost = (req, res, next) => {
       return user.save();
     })
     .then(result => {
+      io.getIO().emit("posts", {
+        action: "create",
+        post: { ...post._doc, creator: { _id: req.userId, name: creator.name } },
+      });
       res.status(201).json({
         message: "Created post successfully!",
         post: post,
@@ -183,7 +190,7 @@ exports.deletePost = (req, res, next) => {
         next(error);
       }
       if (post.creator.toString() !== req.userId.toString()) {
-        const error = new Error("User is not allow to update is post!");
+        const error = new Error("User is not allow to delete is post!");
         error.statusCode = 403;
         throw error;
       }
