@@ -4,10 +4,15 @@ const { body } = require("express-validator");
 //** import model
 const User = require("../models/user");
 
+//* import middlewhere
+const isAuth = require("../middleware/auth");
+
 //** import controllers
 const authController = require("../controllers/auth");
 
 const router = express.Router();
+
+router.get('/status', isAuth, authController.getUserStatus);
 
 router.put(
   "/signup",

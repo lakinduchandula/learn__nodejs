@@ -36,15 +36,25 @@ app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
 );
 
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "*"); // this allow to setHeaders from every domain
+//   res.setHeader(
+//     // this is about what methods that can used by the clients
+//     "Access-Control-Allow-Methods",
+//     "GET, POST, PUT, DELETE, PATCH" // examples which methods can use to connect with end points
+//   );
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // what headers can set by the client
+//   next(); // we have pass the req to next middlwhere
+// });
+
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*"); // this allow to setHeaders from every domain
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
-    // this is about what methods that can used by the clients
     "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH" // examples which methods can use to connect with end points
+    "OPTIONS, GET, POST, PUT, PATCH, DELETE"
   );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // what headers can set by the client
-  next(); // we have pass the req to next middlwhere
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
 });
 
 app.use("/feed", feedRouter);
@@ -67,7 +77,18 @@ mongoose
   .then(result => {
     console.log("Connected to Monogodb Atlas!");
     const server = app.listen(8080);
-    const io = require("socket.io")(server);
+    const io = require("socket.io")(server, {
+      cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"],
+        transports: ["websocket", "polling"],
+        credentials: true,
+      },
+      allowEIO3: true,
+    });
+    io.on("connection", socket => {
+      console.log("Clinet Connected!");
+    });
   })
   .catch(err => {
     console.log(err);
