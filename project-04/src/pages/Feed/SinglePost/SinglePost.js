@@ -1,39 +1,37 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
-import Image from "../../../components/Image/Image";
-import "./SinglePost.css";
+import Image from '../../../components/Image/Image';
+import './SinglePost.css';
 
 class SinglePost extends Component {
   state = {
-    title: "",
-    author: "",
-    date: "",
-    image: "",
-    content: "",
+    title: '',
+    author: '',
+    date: '',
+    image: '',
+    content: ''
   };
 
   componentDidMount() {
     const postId = this.props.match.params.postId;
-    console.log(postId);
-    fetch("http://localhost:8080/feed/post/" + postId, {
+    fetch('http://localhost:8080/feed/post/' + postId, {
       headers: {
-        Authorization: "Bearer " + this.props.token,
-      },
+        Authorization: 'Bearer ' + this.props.token
+      }
     })
       .then(res => {
         if (res.status !== 200) {
-          throw new Error("Failed to fetch status");
+          throw new Error('Failed to fetch status');
         }
         return res.json();
       })
       .then(resData => {
-        console.log("resData => ", resData.post);
         this.setState({
           title: resData.post.title,
           author: resData.post.creator.name,
-          image: "http://localhost:8080/" + resData.post.imageUrl,
-          date: new Date(resData.post.createdAt).toLocaleDateString("en-US"),
-          content: resData.post.content,
+          image: 'http://localhost:8080/' + resData.post.imageUrl,
+          date: new Date(resData.post.createdAt).toLocaleDateString('en-US'),
+          content: resData.post.content
         });
       })
       .catch(err => {

@@ -7,7 +7,6 @@ const { validationResult } = require("express-validator");
 const Post = require("../models/post");
 const User = require("../models/user");
 
-const { findByIdAndRemove } = require("../models/post");
 
 exports.getPosts = (req, res, next) => {
   const currentPage = req.query.page || 1;
@@ -42,7 +41,7 @@ exports.createPost = (req, res, next) => {
   const title = req.body.title;
   const content = req.body.content;
   const errors = validationResult(req); // this will catch all the errors caught by routering file
-  console.log("=================== Come to create Post =====================");
+
   let creator;
 
   if (!errors.isEmpty()) {
@@ -58,8 +57,7 @@ exports.createPost = (req, res, next) => {
   }
 
   const imageUrl = req.file.path.replace("\\", "/");
-  console.log("req.user id ============================ ", req.userId);
-
+ 
   // create post in database
   const post = new Post({
     title: title,
@@ -139,7 +137,8 @@ exports.updatePost = (req, res, next) => {
         error.statusCode = 404;
         next(err);
       }
-      if (post.creator.toString() !== req.userId.toString()) {
+      // console.log('UserId =====> ',req.userId)
+      if (post.creator.toString() !== req.userId) {
         const error = new Error("User is not allow to update is post!");
         error.statusCode = 403;
         throw error;

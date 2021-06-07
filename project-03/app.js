@@ -66,7 +66,8 @@ mongoose
   )
   .then(result => {
     console.log("Connected to Monogodb Atlas!");
-    app.listen(8080);
+    const server = app.listen(8080);
+    const io = require("socket.io")(server);
   })
   .catch(err => {
     console.log(err);

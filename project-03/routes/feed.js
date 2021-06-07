@@ -12,7 +12,7 @@ const feedController = require("../controllers/feed");
 router.get("/posts", isAuth, feedController.getPosts);
 
 router.post(
-  "/posts",
+  "/post",
   [
     body("title").trim().isLength({ min: 5 }),
     body("content").trim().isLength({ min: 5 }),
@@ -29,6 +29,7 @@ router.put(
     body("title").trim().isLength({ min: 5 }),
     body("content").trim().isLength({ min: 5 }),
   ],
+  isAuth,
   feedController.updatePost
 );
 
