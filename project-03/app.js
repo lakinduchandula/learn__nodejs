@@ -8,7 +8,7 @@ const { nanoid } = require("nanoid");
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolver = require("./graphql/resolvers");
 
-const { graphqlHTTP } = require('express-graphql');
+const { graphqlHTTP } = require("express-graphql");
 const app = express();
 
 const fileStorage = multer.diskStorage({
@@ -34,7 +34,11 @@ const fileFilter = (req, file, cb) => {
 
 app.use(
   "/graphql",
-  graphqlHTTP({ schema: graphqlSchema, rootValue: graphqlResolver })
+  graphqlHTTP({
+    schema: graphqlSchema,
+    rootValue: graphqlResolver,
+    graphiql: true,
+  })
 );
 
 app.use(express.json()); // application/json
