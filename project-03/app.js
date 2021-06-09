@@ -4,9 +4,12 @@ const path = require("path");
 const multer = require("multer");
 const { nanoid } = require("nanoid");
 
-//* import graphql
+//** import graphql
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolver = require("./graphql/resolvers");
+
+//** import middleware
+const auth = require("./middleware/auth");
 
 const { graphqlHTTP } = require("express-graphql");
 const app = express();
@@ -61,6 +64,8 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+app.use(auth);
 
 app.use(
   "/graphql",

@@ -45,6 +45,7 @@ type RootQuery {
 
 type RootMutation {
     createUser(userInput: UserInputData): User!
+    createPost(postInput: PostInputData): Post!
 }
 
 schema {
