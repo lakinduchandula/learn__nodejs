@@ -139,4 +139,45 @@ module.exports = {
         console.log(err);
       });
   },
+  posts({ page }, req) {
+    // check if user authenticated
+    if (!req.isAuth) {
+      const error = new Error("Not an Authorized User!");
+      error.code = 401;
+      throw error;
+    }
+    if (!page) {
+      page = 1;
+    }
+    // declare variable for total posts
+    let totalPosts;
+    const perPage = 3;
+
+    return Post.find()
+      .countDocuments()
+      .then(count => {
+        totalPosts = count;
+        return Post.find()
+          .sort({ createdAt: -1 })
+          .skip((page - 1) * perPage)
+          .limit(perPage)
+          .populate("creator");
+      })
+      .then(posts => {
+        return {
+          posts: posts.map(post => {
+            return {
+              ...post._doc,
+              _id: post._id.toString(),
+              createdAt: post.createdAt.toISOString(),
+              updatedAt: post.updatedAt.toISOString(),
+            };
+          }),
+          totalPosts: totalPosts,
+        };
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  },
 };
