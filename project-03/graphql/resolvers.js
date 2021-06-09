@@ -87,7 +87,6 @@ module.exports = {
       throw error;
     }
     const errors = [];
-    console.log(postInput);
     if (
       validator.isEmpty(postInput.title) ||
       !validator.isLength(postInput.title, { min: 5 })

@@ -67,6 +67,18 @@ app.use((req, res, next) => {
 
 app.use(auth);
 
+app.put("/post-image", (res, req, next) => {
+  if (!req.file) {
+    return res.status(200).json({ message: "No file provided!" });
+  }
+  if (req.body.oldPath) {
+    clearImage(req.body.oldPath);
+  }
+  return res
+    .status(201)
+    .json({ message: "File Stored", filePath: req.file.path });
+});
+
 app.use(
   "/graphql",
   graphqlHTTP({
@@ -106,3 +118,12 @@ mongoose
   .catch(err => {
     console.log(err);
   });
+
+const clearImage = filePath => {
+  filePath = path.join(__dirname, "..", filePath);
+  fs.unlink(filePath, err => {
+    if (err) {
+      console.log("Error => ", err);
+    }
+  });
+};
