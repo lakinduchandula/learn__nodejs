@@ -4,9 +4,12 @@ const path = require("path");
 const multer = require("multer");
 const { nanoid } = require("nanoid");
 
-//* import graphql
+//** import graphql
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolver = require("./graphql/resolvers");
+
+//** import middleware
+const auth = require("./middleware/auth");
 
 const { graphqlHTTP } = require("express-graphql");
 const app = express();
@@ -32,15 +35,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-app.use(
-  "/graphql",
-  graphqlHTTP({
-    schema: graphqlSchema,
-    rootValue: graphqlResolver,
-    graphiql: true,
-  })
-);
-
 app.use(express.json()); // application/json
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(
@@ -65,8 +59,43 @@ app.use((req, res, next) => {
     "OPTIONS, GET, POST, PUT, PATCH, DELETE"
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
   next();
 });
+
+app.use(auth);
+
+app.put("/post-image", (res, req, next) => {
+  if (!req.file) {
+    return res.status(200).json({ message: "No file provided!" });
+  }
+  if (req.body.oldPath) {
+    clearImage(req.body.oldPath);
+  }
+  return res
+    .status(201)
+    .json({ message: "File Stored", filePath: req.file.path });
+});
+
+app.use(
+  "/graphql",
+  graphqlHTTP({
+    schema: graphqlSchema,
+    rootValue: graphqlResolver,
+    graphiql: true,
+    customFormatErrorFn(err) {
+      if (!err.originalError) {
+        return err;
+      }
+      const data = err.originalError.data;
+      const message = err.originalError.message || "An Error Occurred";
+      const code = err.originalError.code || 500;
+      return { message: message, status: code, data: data };
+    },
+  })
+);
 
 app.use((error, req, res, next) => {
   console.log(error);
@@ -89,3 +118,12 @@ mongoose
   .catch(err => {
     console.log(err);
   });
+
+const clearImage = filePath => {
+  filePath = path.join(__dirname, "..", filePath);
+  fs.unlink(filePath, err => {
+    if (err) {
+      console.log("Error => ", err);
+    }
+  });
+};

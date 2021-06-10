@@ -1,4 +1,6 @@
 const path = require("path");
+const fs = require("fs");
+const https = require("https");
 
 // 3rd party libraries
 const express = require("express");
@@ -9,7 +11,10 @@ const csrf = require("csurf");
 const flash = require("connect-flash");
 const multer = require("multer");
 const { nanoid } = require("nanoid");
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
+const helmet = require("helmet");
+const compression = require("compression");
+const morgan = require("morgan");
 
 // custom (my own) libraries
 const adminRoutes = require("./routes/admin");
@@ -18,9 +23,8 @@ const authRoutes = require("./routes/auth");
 
 const User = require("./models/user");
 
-// constants
-const MONGODB_URI =
-  "mongodb+srv://online-shop-node-application:6C65rHM7bQbxsPPn@cluster0.fjhfb.mongodb.net/shop";
+// constants username: , password:
+const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.fjhfb.mongodb.net/${process.env.MONGO_DEFAULT_DATABASE} `;
 
 // import controllers
 const errorController = require("./controllers/error");
@@ -40,7 +44,7 @@ const fileStorage = multer.diskStorage({
     cb(null, "images");
   },
   filename: (req, file, cb) => {
-    cb(null, nanoid(10) + "-" + file.originalname);
+    cb(null, nanoid(10) + "-" + uuidv4() + "-" + file.originalname);
   },
 });
 
@@ -58,6 +62,19 @@ const fileFilter = (req, file, cb) => {
 
 // initialize cross-site-register-forgery Protectoin String
 const csrfProtection = csrf();
+
+const privateKey = fs.readFileSync("server.key");
+const certificate = fs.readFileSync("server.cert");
+
+const accessLogSteam = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  { flags: "a" }
+);
+
+app.use(helmet());
+app.use(compression());
+app.use(morgan("combined", { stream: accessLogSteam }));
+
 // dest: './images'
 app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
@@ -155,7 +172,10 @@ mongoose
     // mongodb connected msg
     console.log("Connected to Mongodb Atlas!");
     // setup the server to listen on port 3000
-    app.listen(3000);
+    // https
+    //   .createServer({ key: privateKey, cert: certificate }, app)
+    //   .listen(process.env.PORT || 3000);
+    app.listen(process.env.PORT || 3000);
   })
   .catch(err => {
     console.log(err);

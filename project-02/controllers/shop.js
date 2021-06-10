@@ -3,9 +3,8 @@ const path = require("path");
 
 //** 3rd party package
 const PDFDocuments = require("pdfkit");
-const stripe = require("stripe")(
-  "sk_test_51IyWS2DKWbb0YVu6KiDZIy9XoGwJ7PcUpxM7XDMjtwiCvYYipoLVt6fF3ivwKuU4k0EPuwh766XqFCSvrI8SXabs00i8BEJ41R"
-);
+// sk_test_51IyWS2DKWbb0YVu6KiDZIy9XoGwJ7PcUpxM7XDMjtwiCvYYipoLVt6fF3ivwKuU4k0EPuwh766XqFCSvrI8SXabs00i8BEJ41R
+const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 //** import from models
 const Product = require("../models/product");
